@@ -1,0 +1,17 @@
+{
+  "index.qmd": {
+    "index.html": "cb309346"
+  },
+  "about.qmd": {
+    "about.html": "1f4465c9"
+  },
+  "posts/post-with-code/index.qmd": {
+    "index.html": "aacc6081"
+  },
+  "posts/welcome/index.qmd": {
+    "index.html": "3697f9bf"
+  },
+  "posts/SICOP/index.qmd": {
+    "index.html": "40f31445"
+  }
+}
