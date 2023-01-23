@@ -82,10 +82,10 @@ Al estar en la página web interesa irse a la sección de la misma en donde se e
 
 ``` html
 </head>
-	<frameset rows="125,*" cols="*"  onunload="javascript:confirmClose();" >
-		<frame src="/portal/fm/PT_FMJ_TFQ001.jsp?user_cls=" frameborder="0"  name="topFrame" id="topFrame"  scrolling="no" noresize>
-	  	<frame src="/portal/fm/PT_FMJ_MFQ001.jsp?user_cls=" frameborder="0"  name="mainFrame" id="mainFrame" scrolling="yes">
-	</frameset>
+    <frameset rows="125,*" cols="*"  onunload="javascript:confirmClose();" >
+        <frame src="/portal/fm/PT_FMJ_TFQ001.jsp?user_cls=" frameborder="0"  name="topFrame" id="topFrame"  scrolling="no" noresize>
+        <frame src="/portal/fm/PT_FMJ_MFQ001.jsp?user_cls=" frameborder="0"  name="mainFrame" id="mainFrame" scrolling="yes">
+    </frameset>
 </html>
 ```
 
@@ -148,7 +148,7 @@ sapply(webElems, function(x){x$getElementAttribute("src")})
 
 ```
 
-Apreciamos nuevamente que existen dos frames, pero al analizar la estructura de la página, vemos que el frame con los parámetros para buscar se encuentran en el segundo frame. Para ello se selecciona el mainframe y en el mainframe se selecciona el rightframe.
+Apreciamos nuevamente que existen dos frames, pero al analizar la estructura de la página, vemos que el frame con los parámetros para buscar se encuentran en el segundo frame. Para ello se selecciona el `mainFrame` y en el `mainFrame` se selecciona el `rightFrame`.
 
 Además, se desea buscar todos los resultados que tengan la palabra "Municipalidad" en su texto. Para esto se busca y selecciona el cuadro donde se escribe y se coloca el texto.
 
@@ -180,15 +180,20 @@ dd <- "01" # Día
 mm <- "01" # Mes
 aa <- "2010" # Año
 
-strdate <- paste0(dd,mm,aa) # deben ser de tipo string o si no se borran los ceros
+strdate <- paste0(dd,mm,aa)
 
 # Se encuentra el cuadro de fecha con el xpath
 
 fecha <- remDr$findElement("xpath", '//*[@id="regDtFrom"]')
 
-fecha$clickElement() # Se clickea la fecha
-fecha$clearElement() # Se borra la fecha que está puesta por default
-fecha$sendKeysToElement(list(strdate)) # Se escribe lo que interesa
+# Se clickea la fecha
+fecha$clickElement() 
+
+# Se borra la fecha que está puesta por default
+fecha$clearElement() 
+
+# Se escribe lo que interesa
+fecha$sendKeysToElement(list(strdate)) 
 ```
 
 Enseguida, se busca la opción de "Estado del Concurso" mediante su `xpath`, el cual se obtiene desde el navegador. Se selecciona la opción "Todos"
@@ -196,7 +201,9 @@ Enseguida, se busca la opción de "Estado del Concurso" mediante su `xpath`, el 
 ```{r}
 #| eval: false
 
-remDr$findElement("xpath","/html/body/div[1]/div/div[2]/form[1]/table/tbody/tr[12]/td/select/option[1]")$clickElement() # Estado del concurso
+# Estado del concurso
+remDr$findElement("xpath",
+                  "/html/body/div[1]/div/div[2]/form[1]/table/tbody/tr[12]/td/select/option[1]")$clickElement()
 
 ```
 
@@ -210,7 +217,9 @@ Finalmente, para realizar la búsqueda se realiza click al cuadro de `consultar`
 # Para consultar
 # Se hace una variable para con la consulta para facilitar el ejemplo
 Consultar <- remDr$findElement("xpath", "/html/body/div[1]/div/div[2]/p/span/a") 
-Consultar$clickElement() # Se hace click en consultar (por xpath)
+
+# Se hace click en consultar (por xpath)
+Consultar$clickElement() 
 ```
 
 Al realizar la búsqueda se aprecia que los contenidos se encuentran en una tabla y además existe una cantidad de páginas con más tablas. Si se desea obtener todo el contenido de todas las páginas entonces el objetivo es la obtención de todas las tablas por cada páginas.
@@ -256,7 +265,7 @@ Dicha tabla correspondería al contenido de tabla actual de la página web de SI
 # Si usas esta opción, la pestaña se maximiza y el screnshot abarcará más área
 # remDr$maxWindowSize() 
 
-remDr$screenshot(file = "output/ss/SICOP_Municipalidad.png") # Tomar screenshot
+remDr$screenshot(file = "output/ss/SICOP_Municipalidad.png")
 ```
 
 El screenshot se vería de la siguiente forma:
@@ -271,7 +280,8 @@ Según la tarea que se realice, puede que interese la obtención de más detalle
 #| eval: false
 
 # Se busca el xpath y se clickea
-remDr$findElement("xpath", "/html/body/div[1]/div/div[2]/table[2]/tbody/tr[2]/td[2]/a[1]"
+remDr$findElement("xpath", 
+                  "/html/body/div[1]/div/div[2]/table[2]/tbody/tr[2]/td[2]/a[1]"
                   )$clickElement()
 ```
 
@@ -279,6 +289,7 @@ remDr$findElement("xpath", "/html/body/div[1]/div/div[2]/table[2]/tbody/tr[2]/td
 #| eval: false
 
 html <- read_html(remDr$getPageSource()[[1]])
+
 
 read_html(remDr$getPageSource()[[1]]) %>% 
   html_nodes(xpath = "/html/body/div/div/div[2]/table[3]") %>% 
@@ -296,19 +307,29 @@ Al pasar la tabla a formato largo, se asignan los nombres de columna que fueron 
 html <- read_html(remDr$getPageSource()[[1]]) %>% 
   html_nodes(xpath = "/html/body/div/div/div[2]/table[3]")
 
-nomb.column <- html %>% # Para obtener nombre de columna
-  html_nodes("th.epcthl") %>% # Nodo con el contenido
-  html_text() %>% # formato
-  str_trim(side = "both") %>% # limpieza
-  str_squish() %>% # remover espacios en blanco repetidos al interior del string
-  make.names() # Se vuelve texto valido para nombre de columna
-
-contenido <- html %>% # Para obtener contenido
-  html_nodes("td.eptdl") %>% # Nodo con el contenido
+nomb.column <- html %>% 
+  html_nodes("th.epcthl") %>%
   html_text() %>% 
-  str_trim(side = "both") %>% # limpieza
-  str_squish() # remover espacios en blanco repetidos al interior del string
+  str_trim(side = "both") %>%
+  str_squish() %>% 
+  make.names()
+
+contenido <- html %>% 
+  html_nodes("td.eptdl") %>% 
+  html_text() %>% 
+  str_trim(side = "both") %>% 
+  str_squish() 
 ```
+
+::: column-margin
+`tp.epcthl` es el nodo de los nombres de columna de la tabla.
+
+`td.eptdl` es el nodo del contenido de la tabla
+
+Se utiliza `str_trim(side = "both")` para limpiar los espacios en blanco al final y al inicio del contenido.
+
+Se utiliza `str_squish()` para limpiar espacios en blanco adentro del string
+:::
 
 Para regresar a la página donde se encuentra el resto de concursos únicamente se debe especificar lo siguiente:
 
@@ -326,8 +347,12 @@ Ya obtenidos los nombres de columna y contenidos se procede a dar estructura a l
 # al largo del "nomb.column" que será los nombres de columna
 df0 <- data.frame(matrix(ncol = length(nomb.column))) 
 
-df0[nrow(df0),] <- contenido # Se asigna la fila con el contenido
-colnames(df0) <- nomb.column # Se asignan nombres de columna
+
+# Se asigna la fila con el contenido
+df0[nrow(df0),] <- contenido
+
+# Se asignan nombres de columna
+colnames(df0) <- nomb.column 
 ```
 
 El resultado de la tabla obtenida debería ser similar a la siguiente (para facilitar la visualización únicamente se muestran 3 elementos de la tabla):
@@ -415,7 +440,7 @@ remDr$navigate('https://www.sicop.go.cr/moduloOferta/search/EP_SEJ_COQ600.jsp')
 
 DescProc <- remDr$findElement("name", "cartelNm") 
 
-DescProc$sendKeysToElement(list("Municipalidad")) # Se escribe lo que interesa
+DescProc$sendKeysToElement(list("Municipalidad"))
 
 # Cambiar fecha
 
@@ -423,22 +448,21 @@ dd <- "01" # Día
 mm <- "01" # Mes
 aa <- "2010" # Año
 
-strdate <- paste0(dd,mm,aa) # deben ser de tipo string o si no se borran los ceros
+strdate <- paste0(dd,mm,aa)
 
 # Se encuentra el cuadro de fecha con el xpath
-
 fecha <- remDr$findElement("xpath", '//*[@id="regDtFrom"]')
 
-fecha$clickElement() # Se clickea la fecha
-fecha$clearElement() # Se borra la fecha que está puesta por default
-fecha$sendKeysToElement(list(strdate)) # Se escribe lo que interesa
+fecha$clickElement()
+fecha$clearElement()
+fecha$sendKeysToElement(list(strdate))
 
-remDr$findElement("xpath","/html/body/div[1]/div/div[2]/form[1]/table/tbody/tr[12]/td/select/option[1]")$clickElement() # Estado del concurso
+remDr$findElement("xpath","/html/body/div[1]/div/div[2]/form[1]/table/tbody/tr[12]/td/select/option[1]")$clickElement()
 
 # Para consultar
 # Se hace una variable para con la consulta para facilitar el ejemplo
 Consultar <- remDr$findElement("xpath", "/html/body/div[1]/div/div[2]/p/span/a") 
-Consultar$clickElement() # Se hace click en consultar (por xpath)
+Consultar$clickElement() 
 
 ```
 
@@ -447,12 +471,13 @@ Para obtener el número de concursos para cada página es posible realizar lo si
 ```{r}
 #| eval: false
 
-num_pag <- read_html(remDr$getPageSource()[[1]]) %>% # se extrae numero de paginas
-  html_nodes("li a") %>% # Se especifica lo que contiene el número de páginas
-  html_text() # se devuelve como texto
+# se extrae numero de paginas
+num_pag <- read_html(remDr$getPageSource()[[1]]) %>%
+  # Se especifica lo que contiene el número de páginas
+  html_nodes("li a") %>% 
+  html_text() 
 
 # Se remueven los elementos en blanco
-
 num_pag <- num_pag[num_pag != ""]
 ```
 
@@ -511,9 +536,11 @@ Después de llegar al final del número de páginas que fueron obtenidas y almac
 ```{r}
 #| eval: false
 
-'//*[@id="paging"]/ul/li/a[10]' # xpath para pasar al segundo set de páginas
+# xpath para pasar al segundo set de páginas
+'//*[@id="paging"]/ul/li/a[10]' 
 
-'//*[@id="paging"]/ul/li/a[12]' # xpath para pasar el resto de set de páginas
+# xpath para pasar el resto de set de páginas
+'//*[@id="paging"]/ul/li/a[12]' 
 ```
 
 Existe diferencia entre el `xpath` para pasar al segundo set de páginas y el que permite pasar el resto de set de páginas. Alternativamente, para evitar el uso de código adicional puede utilizarse un identificador de nombre en lugar de un `xpath`. El identificador de nombre para pasar de set de páginas en este caso es "page02" (se obtiene "inspeccionando" en el navegador). Entonces, pasar pasar cualquier set de páginas es posible realizar lo siguiente:

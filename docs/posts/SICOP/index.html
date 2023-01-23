@@ -149,7 +149,7 @@ div.csl-indent {
 <link rel="stylesheet" href="../../styles.css">
 </head>
 
-<body class="floating nav-fixed">
+<body class="floating nav-fixed slimcontent">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -246,7 +246,7 @@ div.csl-indent {
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
     </div>
 <!-- main -->
-<main class="content quarto-banner-title-block" id="quarto-document-content">
+<main class="content quarto-banner-title-block page-columns page-full" id="quarto-document-content">
 
 
 
@@ -351,7 +351,7 @@ div.csl-indent {
 <span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(webElems, <span class="cf">function</span>(x){x<span class="sc">$</span><span class="fu">getElementAttribute</span>(<span class="st">"src"</span>)})</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Apreciamos nuevamente que existen dos frames, pero al analizar la estructura de la página, vemos que el frame con los parámetros para buscar se encuentran en el segundo frame. Para ello se selecciona el mainframe y en el mainframe se selecciona el rightframe.</p>
+<p>Apreciamos nuevamente que existen dos frames, pero al analizar la estructura de la página, vemos que el frame con los parámetros para buscar se encuentran en el segundo frame. Para ello se selecciona el <code>mainFrame</code> y en el <code>mainFrame</code> se selecciona el <code>rightFrame</code>.</p>
 <p>Además, se desea buscar todos los resultados que tengan la palabra “Municipalidad” en su texto. Para esto se busca y selecciona el cuadro donde se escribe y se coloca el texto.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>webElems <span class="ot">&lt;-</span> remDr<span class="sc">$</span><span class="fu">findElements</span>(<span class="st">"name"</span>,<span class="st">"mainFrame"</span>)</span>
@@ -376,19 +376,26 @@ div.csl-indent {
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>mm <span class="ot">&lt;-</span> <span class="st">"01"</span> <span class="co"># Mes</span></span>
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>aa <span class="ot">&lt;-</span> <span class="st">"2010"</span> <span class="co"># Año</span></span>
 <span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>strdate <span class="ot">&lt;-</span> <span class="fu">paste0</span>(dd,mm,aa) <span class="co"># deben ser de tipo string o si no se borran los ceros</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>strdate <span class="ot">&lt;-</span> <span class="fu">paste0</span>(dd,mm,aa)</span>
 <span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Se encuentra el cuadro de fecha con el xpath</span></span>
 <span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>fecha <span class="ot">&lt;-</span> remDr<span class="sc">$</span><span class="fu">findElement</span>(<span class="st">"xpath"</span>, <span class="st">'//*[@id="regDtFrom"]'</span>)</span>
 <span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>fecha<span class="sc">$</span><span class="fu">clickElement</span>() <span class="co"># Se clickea la fecha</span></span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>fecha<span class="sc">$</span><span class="fu">clearElement</span>() <span class="co"># Se borra la fecha que está puesta por default</span></span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>fecha<span class="sc">$</span><span class="fu">sendKeysToElement</span>(<span class="fu">list</span>(strdate)) <span class="co"># Se escribe lo que interesa</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Se clickea la fecha</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>fecha<span class="sc">$</span><span class="fu">clickElement</span>() </span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Se borra la fecha que está puesta por default</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>fecha<span class="sc">$</span><span class="fu">clearElement</span>() </span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Se escribe lo que interesa</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>fecha<span class="sc">$</span><span class="fu">sendKeysToElement</span>(<span class="fu">list</span>(strdate)) </span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Enseguida, se busca la opción de “Estado del Concurso” mediante su <code>xpath</code>, el cual se obtiene desde el navegador. Se selecciona la opción “Todos”</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>remDr<span class="sc">$</span><span class="fu">findElement</span>(<span class="st">"xpath"</span>,<span class="st">"/html/body/div[1]/div/div[2]/form[1]/table/tbody/tr[12]/td/select/option[1]"</span>)<span class="sc">$</span><span class="fu">clickElement</span>() <span class="co"># Estado del concurso</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Estado del concurso</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>remDr<span class="sc">$</span><span class="fu">findElement</span>(<span class="st">"xpath"</span>,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"/html/body/div[1]/div/div[2]/form[1]/table/tbody/tr[12]/td/select/option[1]"</span>)<span class="sc">$</span><span class="fu">clickElement</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="obtención-de-información-tabulada" class="level2">
@@ -398,7 +405,9 @@ div.csl-indent {
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Para consultar</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Se hace una variable para con la consulta para facilitar el ejemplo</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>Consultar <span class="ot">&lt;-</span> remDr<span class="sc">$</span><span class="fu">findElement</span>(<span class="st">"xpath"</span>, <span class="st">"/html/body/div[1]/div/div[2]/p/span/a"</span>) </span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>Consultar<span class="sc">$</span><span class="fu">clickElement</span>() <span class="co"># Se hace click en consultar (por xpath)</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Se hace click en consultar (por xpath)</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>Consultar<span class="sc">$</span><span class="fu">clickElement</span>() </span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Al realizar la búsqueda se aprecia que los contenidos se encuentran en una tabla y además existe una cantidad de páginas con más tablas. Si se desea obtener todo el contenido de todas las páginas entonces el objetivo es la obtención de todas las tablas por cada páginas.</p>
 <p>Sin embargo para comprender como funciona la obtención de información, se puede realizar por pasos. Para obtener la primera tabla se puede realizar lo siguiente:</p>
@@ -483,26 +492,28 @@ Nota
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Si usas esta opción, la pestaña se maximiza y el screnshot abarcará más área</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co"># remDr$maxWindowSize() </span></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>remDr<span class="sc">$</span><span class="fu">screenshot</span>(<span class="at">file =</span> <span class="st">"output/ss/SICOP_Municipalidad.png"</span>) <span class="co"># Tomar screenshot</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>remDr<span class="sc">$</span><span class="fu">screenshot</span>(<span class="at">file =</span> <span class="st">"output/ss/SICOP_Municipalidad.png"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>El screenshot se vería de la siguiente forma:</p>
 <p><img src="output/ss/SICOP_Municipalidad.png" class="img-fluid"></p>
 </section>
 </section>
-<section id="obtención-de-datos-detallados" class="level1">
+<section id="obtención-de-datos-detallados" class="level1 page-columns page-full">
 <h1>Obtención de datos detallados</h1>
 <p>Según la tarea que se realice, puede que interese la obtención de más detalles en la misma página web. En la página de SICOP, al dar click en alguno de las descripciones de procedimientos es posible obtener información más detallada de cada concurso. Mediante el lenguaje R y RSelenium es posible; para esto hay que obtener el xpath de la descripción que se desea clickear.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Se busca el xpath y se clickea</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>remDr<span class="sc">$</span><span class="fu">findElement</span>(<span class="st">"xpath"</span>, <span class="st">"/html/body/div[1]/div/div[2]/table[2]/tbody/tr[2]/td[2]/a[1]"</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>                  )<span class="sc">$</span><span class="fu">clickElement</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>remDr<span class="sc">$</span><span class="fu">findElement</span>(<span class="st">"xpath"</span>, </span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"/html/body/div[1]/div/div[2]/table[2]/tbody/tr[2]/td[2]/a[1]"</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>                  )<span class="sc">$</span><span class="fu">clickElement</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>html <span class="ot">&lt;-</span> <span class="fu">read_html</span>(remDr<span class="sc">$</span><span class="fu">getPageSource</span>()[[<span class="dv">1</span>]])</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="fu">read_html</span>(remDr<span class="sc">$</span><span class="fu">getPageSource</span>()[[<span class="dv">1</span>]]) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">html_nodes</span>(<span class="at">xpath =</span> <span class="st">"/html/body/div/div/div[2]/table[3]"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">html_table</span>(<span class="at">trim =</span> T)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="fu">read_html</span>(remDr<span class="sc">$</span><span class="fu">getPageSource</span>()[[<span class="dv">1</span>]]) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">html_nodes</span>(<span class="at">xpath =</span> <span class="st">"/html/body/div/div/div[2]/table[3]"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">html_table</span>(<span class="at">trim =</span> T)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Entonces, un método más adecuado sería la obtención de los nombres de columna y los contenidos de columna por separado. Esto es posible dado que cada nombre de columna posee un contenido de celda (es decir, no hay más de uno o de otro). Para esto se obtiene el <code>xpath</code> de la tabla de interés (ya que hay varias en la página web), se extrae el código fuente, se extraen los nombres de celda, los contenidos de celda y se asigna un identificador de columna para facilitar el pivot de la tabla.</p>
 <p>Al pasar la tabla a formato largo, se asignan los nombres de columna que fueron obtenidos</p>
@@ -510,20 +521,26 @@ Nota
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>html <span class="ot">&lt;-</span> <span class="fu">read_html</span>(remDr<span class="sc">$</span><span class="fu">getPageSource</span>()[[<span class="dv">1</span>]]) <span class="sc">%&gt;%</span> </span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">html_nodes</span>(<span class="at">xpath =</span> <span class="st">"/html/body/div/div/div[2]/table[3]"</span>)</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>nomb.column <span class="ot">&lt;-</span> html <span class="sc">%&gt;%</span> <span class="co"># Para obtener nombre de columna</span></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">html_nodes</span>(<span class="st">"th.epcthl"</span>) <span class="sc">%&gt;%</span> <span class="co"># Nodo con el contenido</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">html_text</span>() <span class="sc">%&gt;%</span> <span class="co"># formato</span></span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">str_trim</span>(<span class="at">side =</span> <span class="st">"both"</span>) <span class="sc">%&gt;%</span> <span class="co"># limpieza</span></span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">str_squish</span>() <span class="sc">%&gt;%</span> <span class="co"># remover espacios en blanco repetidos al interior del string</span></span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make.names</span>() <span class="co"># Se vuelve texto valido para nombre de columna</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>nomb.column <span class="ot">&lt;-</span> html <span class="sc">%&gt;%</span> </span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">html_nodes</span>(<span class="st">"th.epcthl"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">html_text</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">str_trim</span>(<span class="at">side =</span> <span class="st">"both"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">str_squish</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make.names</span>()</span>
 <span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>contenido <span class="ot">&lt;-</span> html <span class="sc">%&gt;%</span> <span class="co"># Para obtener contenido</span></span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">html_nodes</span>(<span class="st">"td.eptdl"</span>) <span class="sc">%&gt;%</span> <span class="co"># Nodo con el contenido</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>contenido <span class="ot">&lt;-</span> html <span class="sc">%&gt;%</span> </span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">html_nodes</span>(<span class="st">"td.eptdl"</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">html_text</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">str_trim</span>(<span class="at">side =</span> <span class="st">"both"</span>) <span class="sc">%&gt;%</span> <span class="co"># limpieza</span></span>
-<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">str_squish</span>() <span class="co"># remover espacios en blanco repetidos al interior del string</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">str_trim</span>(<span class="at">side =</span> <span class="st">"both"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">str_squish</span>() </span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Para regresar a la página donde se encuentra el resto de concursos únicamente se debe especificar lo siguiente:</p>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<p><code>tp.epcthl</code> es el nodo de los nombres de columna de la tabla.</p>
+<p><code>td.eptdl</code> es el nodo del contenido de la tabla</p>
+<p>Se utiliza <code>str_trim(side = "both")</code> para limpiar los espacios en blanco al final y al inicio del contenido.</p>
+<p>Se utiliza <code>str_squish()</code> para limpiar espacios en blanco adentro del string</p>
+</div></div><p>Para regresar a la página donde se encuentra el resto de concursos únicamente se debe especificar lo siguiente:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>remDr<span class="sc">$</span><span class="fu">goBack</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -533,8 +550,12 @@ Nota
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co"># al largo del "nomb.column" que será los nombres de columna</span></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>df0 <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">matrix</span>(<span class="at">ncol =</span> <span class="fu">length</span>(nomb.column))) </span>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>df0[<span class="fu">nrow</span>(df0),] <span class="ot">&lt;-</span> contenido <span class="co"># Se asigna la fila con el contenido</span></span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(df0) <span class="ot">&lt;-</span> nomb.column <span class="co"># Se asignan nombres de columna</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Se asigna la fila con el contenido</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>df0[<span class="fu">nrow</span>(df0),] <span class="ot">&lt;-</span> contenido</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Se asignan nombres de columna</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(df0) <span class="ot">&lt;-</span> nomb.column </span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>El resultado de la tabla obtenida debería ser similar a la siguiente (para facilitar la visualización únicamente se muestran 3 elementos de la tabla):</p>
 <div class="cell">
@@ -613,7 +634,7 @@ Nota
 <span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>DescProc <span class="ot">&lt;-</span> remDr<span class="sc">$</span><span class="fu">findElement</span>(<span class="st">"name"</span>, <span class="st">"cartelNm"</span>) </span>
 <span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>DescProc<span class="sc">$</span><span class="fu">sendKeysToElement</span>(<span class="fu">list</span>(<span class="st">"Municipalidad"</span>)) <span class="co"># Se escribe lo que interesa</span></span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>DescProc<span class="sc">$</span><span class="fu">sendKeysToElement</span>(<span class="fu">list</span>(<span class="st">"Municipalidad"</span>))</span>
 <span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Cambiar fecha</span></span>
 <span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a></span>
@@ -621,32 +642,32 @@ Nota
 <span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>mm <span class="ot">&lt;-</span> <span class="st">"01"</span> <span class="co"># Mes</span></span>
 <span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>aa <span class="ot">&lt;-</span> <span class="st">"2010"</span> <span class="co"># Año</span></span>
 <span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>strdate <span class="ot">&lt;-</span> <span class="fu">paste0</span>(dd,mm,aa) <span class="co"># deben ser de tipo string o si no se borran los ceros</span></span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>strdate <span class="ot">&lt;-</span> <span class="fu">paste0</span>(dd,mm,aa)</span>
 <span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Se encuentra el cuadro de fecha con el xpath</span></span>
-<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a>fecha <span class="ot">&lt;-</span> remDr<span class="sc">$</span><span class="fu">findElement</span>(<span class="st">"xpath"</span>, <span class="st">'//*[@id="regDtFrom"]'</span>)</span>
-<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a>fecha<span class="sc">$</span><span class="fu">clickElement</span>() <span class="co"># Se clickea la fecha</span></span>
-<span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a>fecha<span class="sc">$</span><span class="fu">clearElement</span>() <span class="co"># Se borra la fecha que está puesta por default</span></span>
-<span id="cb23-30"><a href="#cb23-30" aria-hidden="true" tabindex="-1"></a>fecha<span class="sc">$</span><span class="fu">sendKeysToElement</span>(<span class="fu">list</span>(strdate)) <span class="co"># Se escribe lo que interesa</span></span>
-<span id="cb23-31"><a href="#cb23-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-32"><a href="#cb23-32" aria-hidden="true" tabindex="-1"></a>remDr<span class="sc">$</span><span class="fu">findElement</span>(<span class="st">"xpath"</span>,<span class="st">"/html/body/div[1]/div/div[2]/form[1]/table/tbody/tr[12]/td/select/option[1]"</span>)<span class="sc">$</span><span class="fu">clickElement</span>() <span class="co"># Estado del concurso</span></span>
-<span id="cb23-33"><a href="#cb23-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-34"><a href="#cb23-34" aria-hidden="true" tabindex="-1"></a><span class="co"># Para consultar</span></span>
-<span id="cb23-35"><a href="#cb23-35" aria-hidden="true" tabindex="-1"></a><span class="co"># Se hace una variable para con la consulta para facilitar el ejemplo</span></span>
-<span id="cb23-36"><a href="#cb23-36" aria-hidden="true" tabindex="-1"></a>Consultar <span class="ot">&lt;-</span> remDr<span class="sc">$</span><span class="fu">findElement</span>(<span class="st">"xpath"</span>, <span class="st">"/html/body/div[1]/div/div[2]/p/span/a"</span>) </span>
-<span id="cb23-37"><a href="#cb23-37" aria-hidden="true" tabindex="-1"></a>Consultar<span class="sc">$</span><span class="fu">clickElement</span>() <span class="co"># Se hace click en consultar (por xpath)</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a>fecha <span class="ot">&lt;-</span> remDr<span class="sc">$</span><span class="fu">findElement</span>(<span class="st">"xpath"</span>, <span class="st">'//*[@id="regDtFrom"]'</span>)</span>
+<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a>fecha<span class="sc">$</span><span class="fu">clickElement</span>()</span>
+<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a>fecha<span class="sc">$</span><span class="fu">clearElement</span>()</span>
+<span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a>fecha<span class="sc">$</span><span class="fu">sendKeysToElement</span>(<span class="fu">list</span>(strdate))</span>
+<span id="cb23-30"><a href="#cb23-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-31"><a href="#cb23-31" aria-hidden="true" tabindex="-1"></a>remDr<span class="sc">$</span><span class="fu">findElement</span>(<span class="st">"xpath"</span>,<span class="st">"/html/body/div[1]/div/div[2]/form[1]/table/tbody/tr[12]/td/select/option[1]"</span>)<span class="sc">$</span><span class="fu">clickElement</span>()</span>
+<span id="cb23-32"><a href="#cb23-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-33"><a href="#cb23-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Para consultar</span></span>
+<span id="cb23-34"><a href="#cb23-34" aria-hidden="true" tabindex="-1"></a><span class="co"># Se hace una variable para con la consulta para facilitar el ejemplo</span></span>
+<span id="cb23-35"><a href="#cb23-35" aria-hidden="true" tabindex="-1"></a>Consultar <span class="ot">&lt;-</span> remDr<span class="sc">$</span><span class="fu">findElement</span>(<span class="st">"xpath"</span>, <span class="st">"/html/body/div[1]/div/div[2]/p/span/a"</span>) </span>
+<span id="cb23-36"><a href="#cb23-36" aria-hidden="true" tabindex="-1"></a>Consultar<span class="sc">$</span><span class="fu">clickElement</span>() </span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Para obtener el número de concursos para cada página es posible realizar lo siguiente:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>num_pag <span class="ot">&lt;-</span> <span class="fu">read_html</span>(remDr<span class="sc">$</span><span class="fu">getPageSource</span>()[[<span class="dv">1</span>]]) <span class="sc">%&gt;%</span> <span class="co"># se extrae numero de paginas</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">html_nodes</span>(<span class="st">"li a"</span>) <span class="sc">%&gt;%</span> <span class="co"># Se especifica lo que contiene el número de páginas</span></span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">html_text</span>() <span class="co"># se devuelve como texto</span></span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Se remueven los elementos en blanco</span></span>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># se extrae numero de paginas</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>num_pag <span class="ot">&lt;-</span> <span class="fu">read_html</span>(remDr<span class="sc">$</span><span class="fu">getPageSource</span>()[[<span class="dv">1</span>]]) <span class="sc">%&gt;%</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Se especifica lo que contiene el número de páginas</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">html_nodes</span>(<span class="st">"li a"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">html_text</span>() </span>
 <span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>num_pag <span class="ot">&lt;-</span> num_pag[num_pag <span class="sc">!=</span> <span class="st">""</span>]</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Se remueven los elementos en blanco</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>num_pag <span class="ot">&lt;-</span> num_pag[num_pag <span class="sc">!=</span> <span class="st">""</span>]</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Luego se plantea el loop para obtener todas las tablas por cada página del set de páginas (de la página 1 a la página 10 únicamente).</p>
 <div class="cell">
@@ -697,9 +718,11 @@ Nota
 <p>Después de llegar al final del número de páginas que fueron obtenidas y almacenadas en la variable “num_pag”, es posible seguir con el siguiente set de páginas. Para esto es posible indicar que cuanto se termine el loop de un set de páginas, se pase al siguiente set de páginas y se obtenga nuevamente el número de páginas para el nuevo set. Al revisar los <code>xpath</code> para pasar al siguiente set de páginas se obtiene lo siguiente:<br>
 </p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="st">'//*[@id="paging"]/ul/li/a[10]'</span> <span class="co"># xpath para pasar al segundo set de páginas</span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="st">'//*[@id="paging"]/ul/li/a[12]'</span> <span class="co"># xpath para pasar el resto de set de páginas</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># xpath para pasar al segundo set de páginas</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="st">'//*[@id="paging"]/ul/li/a[10]'</span> </span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="co"># xpath para pasar el resto de set de páginas</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="st">'//*[@id="paging"]/ul/li/a[12]'</span> </span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Existe diferencia entre el <code>xpath</code> para pasar al segundo set de páginas y el que permite pasar el resto de set de páginas. Alternativamente, para evitar el uso de código adicional puede utilizarse un identificador de nombre en lugar de un <code>xpath</code>. El identificador de nombre para pasar de set de páginas en este caso es “page02” (se obtiene “inspeccionando” en el navegador). Entonces, pasar pasar cualquier set de páginas es posible realizar lo siguiente:</p>
 <div class="cell">

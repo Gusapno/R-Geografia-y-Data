@@ -3,7 +3,7 @@
     "path": "~/GitHub/R-Geografia-y-Data/posts/SICOP/index.qmd",
     "project_path": "posts/SICOP/index.qmd",
     "type": "quarto_markdown",
-    "hash": "638155611",
+    "hash": "3121988847",
     "contents": "",
     "dirty": false,
     "created": 1674429274568.0,
@@ -16,16 +16,16 @@
         "Source": "Source",
         "docOutlineVisible": "1",
         "rmdVisualCollapsedChunks": "",
-        "rmdVisualModeLocation": "25944:14311.818359375",
-        "cursorPosition": "690,0",
-        "scrollLine": "0"
+        "rmdVisualModeLocation": "11787:6727.2724609375",
+        "cursorPosition": "303,0",
+        "scrollLine": "308"
     },
     "folds": "",
-    "lastKnownWriteTime": 1674440719,
+    "lastKnownWriteTime": 1674453195,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1674440719980,
+    "last_content_update": 1674453195915,
     "read_only": false,
     "read_only_alternatives": []
 }
