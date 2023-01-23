@@ -1,23 +1,4 @@
 {
-    "sources": [
-        {
-            "URL": "https://www.sicop.go.cr/index.jsp",
-            "author": [
-                {
-                    "literal": "SICOP"
-                }
-            ],
-            "id": "sicop",
-            "issued": {
-                "date-parts": [
-                    [
-                        2015
-                    ]
-                ]
-            },
-            "title": "Información de SICOP",
-            "type": ""
-        }
-    ],
+    "sources": [],
     "project_biblios": []
 }

@@ -228,7 +228,7 @@ kbl(ts) %>%
 ```
 
 ::: callout-note
-Utilizar el botón ubicado al lado superior derecho de la tabla para apreciar el resto de contenido de la tabla
+Utilizar la barra de desplazamiento para lograr apreciar toda la tabla
 :::
 
 ## Capturas de pantalla
@@ -307,24 +307,30 @@ Ya obtenidos los nombres de columna y contenidos se procede a dar estructura a l
 ```{r}
 #| eval: false
 
-# Se realiza un dataframe en blanco con número de columnas igual al largo del "nomb.column" que será los nombres de columna
+# Se realiza un dataframe en blanco con número de columnas igual
+# al largo del "nomb.column" que será los nombres de columna
 df0 <- data.frame(matrix(ncol = length(nomb.column))) 
 
-df0[nrow(df0) + 0,] <- contenido # Se asigna la fila con el contenido
+df0[nrow(df0),] <- contenido # Se asigna la fila con el contenido
 colnames(df0) <- nomb.column # Se asignan nombres de columna
 ```
 
-El resultado de la tabla obtenida debería ser similar a la siguiente:
+El resultado de la tabla obtenida debería ser similar a la siguiente (para facilitar la visualización únicamente se muestran 3 elementos de la tabla):
 
 ```{r}
-# |echo: false
+#| echo: false
+#| column: body-outset
 df <- read.csv("output/csv/tabla2_detalles.csv")
+df <- df[,c(8,16,17)]
 kbl(df) %>%
-  kable_paper(full_width = TRUE) %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left") %>% 
   column_spec(1, bold = T, border_right = T) %>%
-  #column_spec(4, width = "20em", background = "yellow")
-  column_spec(4, width = "20em")
+  column_spec(2, width = "30em")
 ```
+
+Lo que se realizó fue el webscrape de los elementos de la siguiente "tabla":
+
+![](images/image-1589146602.png)
 
 ## Utilización de loops para obtener grandes volúmenes de información
 
