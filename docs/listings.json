@@ -2,7 +2,10 @@
   {
     "listing": "/index.html",
     "items": [
-      "/posts/SICOP/index.html"
+      "/posts/SICOP_Representacion/index.html",
+      "/posts/SICOP_Limpieza/index.html",
+      "/posts/SICOP/index.html",
+      "/posts/OSM_ScrapePuntos/index.html"
     ]
   }
 ]

@@ -1,0 +1,218 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+import pandas as pd
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.support.ui import WebDriverWait
+import time
+import re
+driver = webdriver.Chrome()
+driver.get("https://ventadebienes.bancobcr.com/wps/portal/bcrb/bcrbienes/bienes/Casas?&tipo_propiedad=1")
+first_tab = driver.current_window_handle
+next_pag = '//*[@id="layoutContainers"]/div/div[2]/div[2]/div/section/div[2]/div[4]/div/div[2]/div/div/ul/li[10]'
+xp_maxpag = '//*[@id="layoutContainers"]/div/div[2]/div[2]/div/section/div[2]/div[4]/div/div[2]/div/div/ul/li[10]/a'
+colnames_list = ["Precio","Canton","Folio_Real"]
+df = pd.DataFrame(columns = ["Precio","Canton","Folio_Real"])
+x = driver.find_element(By.XPATH,next_pag).get_attribute("class")
+items_pag = '//div[@class="table-cell cell100"]//div[1]//div//div[1]//div[4]'
+###########
+while x == 'page-item next':
+  x = driver.find_element(By.XPATH,next_pag).get_attribute("class")
+
+  ####
+  for i in range(3,6):
+    j = i - 3
+    element = driver.find_elements(By.XPATH,'//div[@class="table-cell cell100"]//div[1]//div//div[{0}]//div[2]'.format(i))
+    nomb = colnames_list[j]
+    string = []
+    
+    for e in element:
+      string.append((e.text))
+    
+    if i == 3:
+      idx = list(df.index)
+      new_rows = list(map(str, range(df.shape[0]+1, df.shape[0]+len(string)+1)))
+      idx.extend(new_rows)
+      df = df.reindex(index=idx)
+    df.loc[new_rows,nomb] = string
+    del string, element
+
+  driver.find_element(By.XPATH,xp_maxpag).click()
+  time.sleep(0.2)
+
+###########
+
+#element_present = EC.presence_of_element_located((By.XPATH, '//*[@id="table-cell cell50"]'))
+#WebDriverWait(driver, 0.1).until(element_present)
+driver.quit()
+
+new_tab = '//*[@id="layoutContainers"]/div/div[2]/div[2]/div/section/div[2]/div[4]/div/div[1]/div[{0}]/div[1]/div[1]/a'
+driver.execute_script("window.open('about:blank','secondtab');")
+# elem_cont = driver.find_elements(By.XPATH,'//*[@class="table-cell cell33"]')
+
+# iframe = driver.find_element(By.TAG_NAME, "iframe")
+
+
+
+
+
+iframe = driver.find_elements(By.TAG_NAME,'iframe')[0]
+
+
+
+
+
+coord[0]
+driver.switch_to.frame(iframe)
+driver.find_element(By.TAG_NAME, 'button').click()
+
+driver.find_element(By.XPATH,'//*[@class="google-maps-link"]').text
+driver.find_elements(By.XPATH,'//div/div/div[1]/div/div/div/div[2]')
+
+# //*[@id="mapDiv"]/div/div/div[4]/div/div/div/div/div
+
+driver.switch_to.default_content()
+
+# driver.find_element(By.TAG_NAME, 'View larger map')
+
+driver.find_element(By.XPATH,'//*[@id="mapDiv"]').get_attribute("src")
+
+
+# driver.find_elements(By.TAG_NAME("iframe"))
+
+
+
+###########
+###########
+###########
+coord = ["lat","lon"]
+i = 1
+for i in range(1,len(driver.find_elements(By.XPATH, items_pag))+1):
+  link = driver.find_element(By.XPATH,new_tab.format(i)).get_attribute("href")
+  driver.switch_to.window("secondtab")
+  driver.get(link)
+  time.sleep(0.2)
+  elem_titles = driver.find_elements(By.XPATH,'//*[@class="title"]')
+  elem_contgent = driver.find_elements(By.XPATH,'//*[@class="descripcion"]')
+  elem_cont = driver.find_elements(By.XPATH,'//*[@class="table-cell cell33"]')
+  elem_contgent2 = driver.find_elements(By.XPATH,'//*[@class="strongText"]')
+  elem_contgent3 = driver.find_elements(By.XPATH,'//div/div[2]/div[2]/div/section/div[2]/div[2]/div[3]/div[7]/div["label"]')
+  link_coord = driver.find_element(By.XPATH,
+                          '//*[@id="layoutContainers"]/div/div[2]/div[2]/div/section/div[2]/div[2]/div[3]/div[12]/div/iframe').get_attribute("src")
+  # if i == 1:
+  ############################
+  # Nombres columna general
+  str_colgen = []
+  for colnames_elem in elem_titles:
+    str_colgen.append(colnames_elem.text)
+      
+  str_colgen = [ii.split(':')[0] for ii in str_colgen] # Para obtener los títulos de columna específicos. 0 para titulo, 1 para contenido
+
+  # Nombres columna específico
+  str_colname = []
+  for colnames_elem in elem_cont:
+    str_colname.append(colnames_elem.text)
+  str_colname = [ii.split(':')[0] for ii in str_colname] # Para obtener los títulos de columna específicos. 0 para titulo, 1 para contenido
+  
+  
+  for ii in str_colname:
+    str_colgen.append(ii)
+
+  for ii in coord:
+    str_colgen.append(ii)
+  df = pd.DataFrame(columns = str_colgen)
+  
+  ############################
+  # Nombres contenido general
+  str_contgen = []
+  for colnames_elem in elem_contgent:
+    str_contgen.append(colnames_elem.text)
+  str_contgen = [ii.split(':')[0] for ii in str_contgen] # Para obtener los títulos de columna específicos. 0 para titulo, 1 para contenido
+  str_contgen
+  
+  # Nombres contenido general 2
+  str_contgent2 = []
+  for colnames_elem in elem_contgent2:
+    str_contgent2.append(colnames_elem.text)
+    
+  # Nombres contenido general 3
+  str_contgent3 = []
+  for colnames_elem in elem_contgent3:
+    str_contgent3.append(colnames_elem.text) 
+  str_contgent3 = [ii.split(':')[1] for ii in str_contgent3] #
+
+  # Nombres contenido específico
+  str_cont = []
+  for colnames_elem in elem_cont:
+    str_cont.append(colnames_elem.text)
+  str_cont = [ii.split(':')[1] for ii in str_cont] # Para obtener los títulos de columna específicos. 0 para titulo, 1 para contenido
+  
+  coord = re.search(r'(?=)([\-]?[\d]*\.[\d]*),([\-]?[\d]*\.[\d]*)(?=&)', link_coord)[0]
+  coord = coord.split(",")
+
+  for xx in str_contgent3:
+    str_contgen.append(xx)
+  
+  for xy in str_contgent2:
+    str_contgen.append(xy)
+  
+  for xz in str_cont:
+    str_contgen.append(xz)
+    
+  # coord
+  
+  for xz in coord:
+    str_contgen.append(xz)
+  
+  df.loc[i] = str_contgen
+  
+
+  if i == 1:
+      df0 = df
+  if i != 1:
+    df0 = pd.concat([df0,df], join = "outer")
+
+  driver.switch_to.window(first_tab)
+  time.sleep(0.2)
+  
+###########
+###########
+###########
+
+
+
+###########
+###########
+###########
+
+
+while x == 'page-item next':
+  x = driver.find_element(By.XPATH,next_pag).get_attribute("class")
+
+  #### 
+  
+  driver.find_element(By.XPATH,xp_maxpag).click(//*[@id="layoutContainers"]/div/div[2]/div[2]/div/section/div[2]/div[4]/div/div[1]/div[1]/div[1]/div[1]/a)
+  for i in range(3,6):
+    j = i - 3
+    element = driver.find_elements(By.XPATH,'//div[@class="table-cell cell100"]//div[1]//div//div[{0}]//div[2]'.format(i))
+    nomb = colnames_list[j]
+    string = []
+    
+    for e in element:
+      string.append((e.text))
+    
+    if i == 3:
+      idx = list(df.index)
+      new_rows = list(map(str, range(df.shape[0]+1, df.shape[0]+len(string)+1)))
+      idx.extend(new_rows)
+      df = df.reindex(index=idx)
+    df.loc[new_rows,nomb] = string
+    del string, element
+
+  driver.find_element(By.XPATH,xp_maxpag).click()
+  time.sleep(0.2)
+
+###########
+
+
+

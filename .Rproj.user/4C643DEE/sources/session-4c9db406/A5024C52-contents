@@ -1,0 +1,344 @@
+---
+title: "Limpieza de datos scrapeados con R"
+execute:
+  warning: false
+author: "Gabriel Ramírez"
+date: "12/23/2022"
+lang: es
+editor: visual
+csl: apa.csl
+bibliography: references.bib
+categories: [Webscraping, RSelenium, limpieza de datos]
+image: "image.jpg"
+---
+
+# Sobre la limpieza y preparación de datos
+
+La limpieza y/o preparación de datos es una parte esencial del análisis estadístico. Usualmente esto toma más tiempo que el análisis estadístico como tal; usualmente en los ejercicios y ejemplos de análisis estadísticos se asume que los datos tienen una estructura adecuada para el análisis pero en la práctica suele ser necesario preparar el set de datos antes de realizar un análisis a los mismos [@datacleaningR].
+
+Un set de datos técnicamente correcto se entiende como uno en el que cada valor: se puede reconocer que pertenece a cierta variable, es almacenado en un tipo de dato que representa el dominio de valores de la variable en la vida real; es decir, para cada tipo de valor, su variable debe pertenecer a su tipo adecuado (una de texto a una de texto, una numérica a una numérica, etc...). @datacleaningR define un set de datos técnicamente correcto como un set en el que: es almacenada en un `data.frame` con columnas adecuadas y cada columna del `data.frame` es de un tipo que representa adecuadamente el dominio de valores de su variable.
+
+El contenido de un set de datos podría ser no consistente, lo cual puede devenir en errores de análisis. Entre los posibles errores se encuentra el hecho de escribir la misma palabra de formas diferentes, la codificación del texto (por ejemplo, UTF-8), valores faltantes, outliers, valores especiales e incluso espacios en blanco innecesarios en una palabra o oración.
+
+Para lograr la consistencia en la data es posible: detectar las inconsistencias, seleccionar los campos que causan las inconsistencias y la corrección de estos campos ya sea mediante métodos determinísticos (modelos) o estocásticos.
+
+# Búsqueda de inconsistencias
+
+```{r}
+#| output: false
+
+
+# Directorio de trabajo
+setwd("~/GitHub/R-Geografia-y-Data/posts/SICOP_Limpieza")
+
+# Paquetes a utilizar
+library(tidyverse)
+library(knitr)
+library(reshape2)
+library(magrittr)
+library(kableExtra)
+library(stringi)
+library(scraEP) # Para remover acentos
+library(gsubfn)
+# Datos a utilizar
+data <- read.csv("csv/ConcursosSICOP.csv")
+data <- data[,-1]
+```
+
+Una forma básica de conocer la estructura básica del set de datos es utilizar `str()`, aunque en este caso se utiliza un método diferente para facilitar la visualización de la estructura de los datos.
+
+```{r}
+str <- data.frame(variable = names(data),
+           classe = sapply(data, typeof),
+           first_values = sapply(data, function(x) paste0(head(x),  collapse = ", ")),
+           row.names = NULL)
+colnames(str) <- c("Columna","Tipo","Primeros valores")
+```
+
+```{r}
+#| echo: false
+str <- str[22:27,]
+kbl(str) %>%
+  kable_styling(bootstrap_options = "striped", full_width = T, position = "left",font_size = 14)
+rm(str)
+```
+
+::: callout-note
+## Nota sobre la tabla
+
+Únicamente se muestran algunos valores de la tabla para facilitar la lectura.
+:::
+
+En este caso se aprecia que los formatos de variable no corresponden necesariamente a un tipo adecuado para el análisis. Las fechas y el presupuesto poseen formato de tipo `character`, cuando el formato adecuado sería fecha (`date`) y numérico (`double`) respectivamente.
+
+También es posible buscar los valores únicos en columnas de interés, así como en el Estado del Concurso y Nombre de la institución.
+
+```{r}
+unique.estado <- as.data.frame(sort(unique(data$Estado.del.concurso)))
+unique.estado$id <- seq(1:dim(unique.estado)[1])
+colnames(unique.estado) <- c("Estado del concurso","id")
+
+# sort(unique(data$Nombre.de.la.institución))
+
+```
+
+```{r}
+#| echo: false
+kbl(unique.estado) %>%
+  kable_styling(bootstrap_options = "striped", full_width = T, position = "left",font_size = 14)
+```
+
+En el caso de la columna con el estado del concurso la estructura parece ser consistente por lo tanto no será necesario realizar algún tiempo de limpieza o preparación. Se visualizan los primeros y los últimos 5 elementos (de en total 70 elementos).
+
+```{r}
+unique.institucion <- as.data.frame(sort(unique(data$Nombre.de.la.institución)))
+unique.institucion$id <- seq(1:dim(unique.institucion)[1])
+colnames(unique.institucion) <- c("Nombre de la institución","id")
+
+```
+
+```{r}
+#| echo: false
+unique.institucion2 <- unique.institucion[c(1:5,65:70),]
+kbl(unique.institucion2) %>%
+  kable_styling(bootstrap_options = "striped", full_width = T, position = "left",font_size = 14)
+```
+
+Se aprecia que hay elementos que no corresponden a una Municipalidad y también inconsistencias en la forma de escribir las nombres de cada Municipalidad (uso de mayúsculas). Para eliminar los elementos que no corresponden a una Municipalidad, se buscan todos los elementos que empiezan con `"M"` . Esto se realiza después de revisar los contenidos de la tabla y confirmar que todos los elementos que comienzan con `"M"` son municipalidades.
+
+```{r}
+a <- startsWith(unique.institucion$`Nombre de la institución`, "M")
+unique.institucion$value <- a
+
+data_filtrado <- data %>% # Se selecciona el set de datos
+  filter(str_detect(Nombre.de.la.institución, "(?i)^m")) # Se filtra por letra inicial
+rm(a,data)
+```
+
+Con esto se obtienen los valores que inician con `M`. Además se agrega una columna para visualizar y filtrar rápidamente cuales son esos valores que no inician con `M`. En este caso se trata de:
+
+-   Instituto Costarricense de Puertos del Pacífico
+
+-   INSTITUTO DE FOMENTO Y ASESORIA MUNICIPAL
+
+-   Unión Nacional de Gobiernos Locales
+
+Dado que no entran en el análisis de interés, se descartan completamente del set de datos.
+
+## Manipulación de carácteres y normalización
+
+Dadas que las personas pueden escribir las mismas cosas de formas diferentes, los datos de tipo `carácter/character` se pueden volver complicados de procesar. Esto también incluye la posibilidad de espacios en blanco innecesarios (al inicio, entre o al final de las palabras). Este proceso se realiza en
+
+```{r}
+
+#| echo: false
+
+# Se renombra el encargado de publicación de gestión de objerciones y apertura
+# por un nombre corto
+colnames(data_filtrado)[9] <- "Enc.Pub.Gest.Apertu" 
+
+# Se renombra el encargado de solicitar estudio de ofertas recomendación del acto final
+# por un nombre corto
+
+colnames(data_filtrado)[11] <- "Enc.Solic.Est.Ofert" 
+
+
+# Se remueve texto innecesario (se identificó observando el set de datos)
+data_filtrado$Nombre.de.la.institución <- str_remove(data_filtrado$Nombre.de.la.institución, "(?i)Cantón de")
+
+# Se sustituyen los "del" por "de" para facilitar la creación del regex
+data_filtrado$Nombre.de.la.institución <- str_replace_all(data_filtrado$Nombre.de.la.institución,"del","de")
+
+# Se separa en dos columna
+data_filtrado <- data_filtrado %>% separate(Nombre.de.la.institución,
+                                            c("Institución","Nombre")
+                                            ,sep = "(?i)\\A^.*?(?<!de).*?\\Kde")
+# Se limpian los espacios en blanco
+data_filtrado$Nombre <- str_trim(data_filtrado$Nombre,side = "both") 
+
+# Se aplica limpieza sobre esas columnas
+# Se pasa a formato de titulo y se corrigen ciertos elementos
+for (i in 10:12) {
+data_filtrado[,i] <- str_to_title(data_filtrado[,i])
+data_filtrado[,i] <- str_replace_all(data_filtrado[,i],'\\b(De)\\b',"de")
+data_filtrado[,i] <- str_replace_all(data_filtrado[,i],'\\b(Los)\\b',"los")
+}
+
+# Se pasa a formato de título y se pasa a minúscula el "De" resultante
+data_filtrado$Institución <- str_to_title(data_filtrado$Institución)
+data_filtrado$Nombre <- str_to_title(data_filtrado$Nombre)
+data_filtrado$Nombre <- str_replace_all(data_filtrado$Nombre,'\\b(De)\\b',"de")
+
+# data_filtrado <- respaldo
+respaldo <- data_filtrado
+
+# Se pasa a formato de oración diversas columnas
+for (i in 17:19) {
+data_filtrado[,i] <- str_to_sentence(data_filtrado[,i])
+}
+data_filtrado$Enc.Solic.Est.Ofert <- str_to_sentence(data_filtrado$Enc.Solic.Est.Ofert)
+
+# 
+data_filtrado$Nombre <- str_replace_all(data_filtrado$Nombre," de Heredia","")
+data_filtrado$Nombre <- str_replace_all(data_filtrado$Nombre," de Pacayas","")
+```
+
+# Búsqueda y localización de errores
+
+Se analiza la consistencia del texto de algunas columnas de interés. Esto con el fin de encontrar y localizar posibles errores. Para esto se utiliza la función `unique()` para conocer los valores únicos de cada columna, con lo cual es posible conocer si existe alguna inconsistencia.
+
+```{r}
+#| message: true
+# Se escriben y concatenan los nombres de las columnas de interés
+# Se excluye una de ellas para visualizar mejor el resultado
+
+nombres <- c("Estado.del.concurso","Clasificación.del.objeto",
+             "Tipo.de.procedimiento","Tipo.de.modalidad") #,"Fundamento.jurídico")
+
+# Se realiza bucle para aplicar la misma función a las columnas seleccionadas
+for (i in 1:length(nombres)) {
+  message(paste0("Resultados para la columna llamada ",nombres[i],"..."))
+  a <- paste0("data_filtrado$",nombres[i])
+  print(unique(eval(parse(text = a))))
+
+}
+
+
+```
+
+Se aprecia que existe una consistencia mínima (no se repiten valores que tienen el mismo significado) en los valores de las columnas, por lo tanto no es necesario aplicar una limpieza a las mismas.
+
+## Conversiones de tipos
+
+Para la búsqueda y localización de errores es posible revisar las columnas de interés. Esto con tal de buscar y localizar posibles errores que afecten la consistencia de los datos. Antes de ello, es posible descartar algunas columnas que no ofrecen ningún tipo de información.
+
+```{r}
+#| echo: false
+
+data_filtrado <- data_filtrado[,-1] # Se elimina columna innecesaria
+
+# Se remueve el "[CRC]" de la columna de presupuesto
+data_filtrado$Presupuesto.total.estimado <- str_replace_all(data_filtrado$Presupuesto.total.estimado,"\\s\\[CRC\\]","")
+
+# Se quita el punto (como separador de miles)
+data_filtrado$Presupuesto.total.estimado <- str_replace_all(data_filtrado$Presupuesto.total.estimado,"\\.","")
+
+# Se cambia la "," por un "."
+data_filtrado$Presupuesto.total.estimado <- str_replace_all(data_filtrado$Presupuesto.total.estimado,"\\,",".")
+
+# Se cambia a formato numérico para un adecuado análisis
+data_filtrado$Presupuesto.total.estimado <- as.numeric(data_filtrado$Presupuesto.total.estimado)
+
+```
+
+# Códigos de cantón
+
+Para facilitar un posible análisis espacial es necesario añadir los códigos de cantón. Para esto se extraen los códigos de cantón del límite cantonal 1:5000 (obtenido del SNIT). Para facilitar el proceso se remueven las tildes.
+
+```{r}
+library(sf)
+library(gsubfn)
+cant.sf <- st_read("sp/LimCant5K.shp")
+
+cant_nombres <- as.data.frame(cant.sf[,3:4])
+cant_nombres <- cant_nombres[order(cant_nombres$cod_canton),]
+
+unwanted_array <- list('Š'='S', 'š'='s', 'Ž'='Z', 'ž'='z', 'À'='A', 'Á'='A', 'Â'='A','Ã'='A', 'Ä'='A', 'Å'='A', 'Æ'='A', 'Ç'='C', 'È'='E', 'É'='E','Ê'='E', 'Ë'='E', 'Ì'='I', 'Í'='I', 'Î'='I', 'Ï'='I', 'Ò'='O', 'Ó'='O', 'Ô'='O', 'Õ'='O', 'Ö'='O', 'Ø'='O', 'Ù'='U','Ú'='U', 'Û'='U', 'Ü'='U', 'Ý'='Y', 'Þ'='B', 'ß'='Ss', 'à'='a', 'á'='a', 'â'='a', 'ã'='a','ä'='a','å'='a', 'æ'='a', 'ç'='c','è'='e', 'é'='e', 'ê'='e', 'ë'='e','ì'='i','í'='i', 'î'='i', 'ï'='i', 'ð'='o', 'ò'='o', 'ó'='o', 'ô'='o', 'õ'='o','ö'='o', 'ø'='o', 'ù'='u', 'ú'='u', 'û'='u', 'ý'='y', 'ý'='y', 'þ'='b', 'ÿ'='y' ) # Lista de acentos y sus equivalentes sin acento
+
+cant_nombres$canton <- gsubfn(paste(names(unwanted_array),collapse='|'), 
+                      unwanted_array,cant_nombres$canton)
+data_filtrado$Nombre <- gsubfn(paste(names(unwanted_array),collapse='|'), 
+                               unwanted_array,data_filtrado$Nombre)
+
+data_filtrado$Nombre <- str_replace_all(data_filtrado$Nombre,"Leon Cortes",
+                                        "Leon Cortes Castro")
+
+data_filtrado$Nombre <- str_replace_all(data_filtrado$Nombre,"\\.","")
+
+rm(unwanted_array)
+```
+
+Ahora lo que se desea, es agregar una columna con los códigos de cantón para facilitar la representación espacial de los datos. Para esto se utiliza un loop para agregar valores para cada fila de la columna basado en los valores del nombre de cantón
+
+```{r}
+data_filtrado$cant_cod <- ""
+
+
+for (i in 1:length(data_filtrado$Nombre)) {
+  # Se busca el nombre de cantón en la columna nombre, fila i
+  check <- data_filtrado$Nombre[i]
+  
+  # Se busca el nombre de cantón en la tabla de cant_nombres y su fila
+  check2 <- which(cant_nombres$canton == check)
+  
+  # Se guarda el código de cantón en una variable
+  cod <- cant_nombres[check2,1]
+  
+  # Se agrega el número de cantón a data_filtrado
+  data_filtrado$cant_cod[i] <- cod
+  
+  # Se remueve la variable con el código
+  rm(cod)
+}
+
+# Exportar la tabla
+write.csv(data_filtrado,"output/csv/TablaLimpiaSICOP.csv")
+
+```
+
+Con estos estos códigos de cantón se facilita la representación espacial de los datos. Además de esto es posible cambiar de formato largo a formato ancho. Un formato ancho (wide format) posee valores que no se repiten en la columna de nombres, mientras que en un formato largo se repiten valores en la columna de nombres (por ejemplo, se repiten nombres de cantón).
+
+-   Primero se pasa a formato ancho para facilitar la visualización en mapa
+
+-   Dentro de la aplicación, hacer referencia a la tabla con el nombre de cantón para referirse a la tabla original
+
+```{r}
+#| echo: false
+
+a <- data.sicop
+a <- a[,-c(1,3,4,6,7,8,12:19)]
+a[a == ''] <- "Sin definir"
+
+a <- table(cbind(a["Nombre"], col=do.call(paste0, stack(a[-2])[1:1])))
+a <- as.data.frame.matrix(a)
+a <- tibble::rownames_to_column(a,"Nombres")
+
+# Se añaden los codigos de cantón
+
+for (i in 1:length(a$Nombres)) {
+  # Se busca el nombre de cantón en la columna nombre, fila i
+  check <- a$Nombres[i]
+  
+  # Se busca el nombre de cantón en la tabla de cant_nombres y su fila
+  check2 <- which(cant_nombres$canton == check)
+  
+  # Se guarda el código de cantón en una variable
+  cod <- cant_nombres[check2,1]
+  # geom <- cant_nombres[check2,3]
+  # Se agrega el número de cantón a data_filtrado
+  a$cant_cod[i] <- cod
+  # a$geom[i] <- geom
+  # Se remueve la variable con el código
+  rm(cod) #, geom)
+}
+
+
+write.csv(a,"output/csv/Tab_Cod_SICOP.csv")
+
+```
+
+# Retoques adicionales a la tabla limpia
+
+```{r}
+data.sicop <- read.csv("output/csv/TablaLimpiaSICOP.csv",fileEncoding = "windows-1252")
+
+data.sicop <- data.sicop[,-c(1,4,6,7,9,10:13,20,21)]
+
+data.sicop[c(1,8:10)][data.sicop[c(1,8:10)] == ''] <- "Sin definir"
+data.sicop[, c(1,8:10)][is.na(data.sicop[, c(1,8:10)])] <- "Sin definir"
+
+data.sicop$Clasificación.del.objeto <- str_replace_all(data_filtrado$Clasificación.del.objeto,"Obra publica", "Obra pública")
+
+write.csv(data.sicop,"output/csv/TablaLimpiaSICOP_reducida_2.csv")
+
+```

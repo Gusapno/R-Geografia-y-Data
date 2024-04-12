@@ -1,0 +1,278 @@
+
+# Paquetes a utilizar
+
+library(reticulate)
+py_install("selenium")
+binman::list_versions("chromedriver")
+list_versions("chromedriver")
+library(RSelenium)
+library(tidyverse)
+library(rvest)
+library(xml2)
+library(stringi)
+library(seleniumPipes)
+library(XML)
+library(knitr)
+library(kableExtra)
+library(netstat) # Para el free_port()
+
+
+# Este script permite obtener los concursos de 
+# municipalidades que se encuentran en la etapa de recepción de ofertas
+
+# Empezar el servidor
+rs_driver_object <- rsDriver(browser = 'chrome', # Se utilizará Google Chrome
+                             chromever = 'latest', # Versión de Chrome
+                             verbose = FALSE, # No incluir mensajes de estado
+                             port = free_port(), # Se utiliza un puerto libre
+                             check = TRUE) # Checar si hay nuevas versiones
+
+# crear un objeto cliente
+remDr <- rs_driver_object$client
+
+# Se navega a la página de interés
+
+remDr$navigate('https://www.sicop.go.cr/index.jsp') # 
+
+# Se busca el identificador de los frames
+
+webElems <- remDr$findElements("tag name","frame")
+
+# Se aprecian los enlaces de frames existentes
+
+remDr$switchToFrame(webElems[[1]])
+
+# Se busca el elemento de interés e inmediatamente se clickea el mismo
+# Se especifica el método de búsqueda y se coloca el identificador
+# luego se indica dar click en el elemento
+
+remDr$findElement("xpath", 
+                  "/html/body/div[2]/div/div/div[4]/ul/li[2]/div[1]/a[4]")$clickElement()
+
+remDr$switchToFrame(NA) #
+
+# Se busca el identificador de los frames
+
+webElems <- remDr$findElements("tag name","frame")
+
+# Se aprecian los enlaces de frames existentes
+
+webElems <- remDr$findElements("name","mainFrame")
+remDr$switchToFrame(webElems[[1]])
+webElems2 <- remDr$findElements("name","rightFrame")
+remDr$switchToFrame(webElems2[[1]])
+
+# Se busca el identificador para la descripción de procedimiento
+
+DescProc <- remDr$findElement("name", "sch_cartelNm") 
+
+DescProc$sendKeysToElement(list("Municipalidad")) # Se escribe lo que interesa
+
+# Cambiar fecha
+
+dd <- "01" # Día
+mm <- "01" # Mes
+aa <- "2023" # Año
+
+strdate <- paste0(dd,mm,aa)
+
+# Se encuentra el cuadro de fecha con el xpath
+
+fecha <- remDr$findElement("xpath", '//*[@id="sch_cont_ymd1"]')
+
+# Se clickea la fecha
+fecha$clickElement() 
+
+# Se borra la fecha que está puesta por default
+fecha$clearElement() 
+
+# Se escribe lo que interesa
+fecha$sendKeysToElement(list(strdate))
+
+# Estado del concurso
+# remDr$findElement("xpath",
+#                   "/html/body/div[1]/div/div[2]/form[1]/table/tbody/tr[12]/td/select/option[1]")$clickElement()
+
+
+# Para consultar
+# Se hace una variable para con la consulta para facilitar el ejemplo
+Consultar <- remDr$findElement("xpath", '//*[@id="Btn_gray"]/a/em') 
+
+# Se hace click en consultar (por xpath)
+Consultar$clickElement() 
+
+
+tot_pags <- read_html(remDr$getPageSource()[[1]]) %>% 
+  # Se especifica lo que contiene el número de páginas
+  html_nodes(xpath = '//*[@id="total"]/span[3]') %>% 
+  html_text() %>% 
+  # Se pasa a numérico
+  as.numeric()
+
+set_pags <- ceiling(tot_pags/10) # Floor para redondear hacia arriba
+
+# Loop para los sets de páginas
+
+xp1 <- "/html/body/div[1]/form/div[2]/div/table/tbody/tr["
+xp2 <- "]/td[3]/a"
+
+for (i in 1:set_pags) {
+  i <- 1
+  num_pag <- read_html(remDr$getPageSource()[[1]]) %>%
+    html_nodes("li a") %>% 
+    html_text()
+  num_pag <- num_pag[num_pag != ""]
+  num_pag <- length(num_pag)+1
+  
+  # Loop para las páginas de un set
+  
+  for (ii in 1:(max(num_pag))) { 
+    # Si el número de iteración es mayor a 1 entonces
+    # se pasará la página
+    ii <- 1
+    if (ii > 1){
+      remDr$findElement("xpath",
+                        paste0('//*[@id="paging"]/ul/li/a[',ij,']'))$clickElement()
+    }
+    
+    # Se determina el número de concursos que tiene la tabla
+    # para la determinada página
+    
+    nrow_tab <- read_html(remDr$getPageSource()[[1]]) %>% 
+      html_nodes(xpath = "/html/body/div[1]/div/div[2]/table[2]") %>%
+      html_table() %>%
+      as.data.frame() %>% 
+      nrow() 
+    
+    # Loop para los rows
+    
+    for (j in 1:nrow_tab) {
+      j <- 1
+      
+      
+      print(paste0("Scrapeando contenido del concurso ",j))
+      jj <- as.numeric(j) + 1
+      
+      
+      # Se clickea en el elemento j de la tabla
+      
+      remDr$findElement("xpath", paste0(xp1,jj,xp2))$clickElement()
+      remDr$findElement("xpath", 
+                        '/html/body/div[2]/form/div/div[2]/table/tbody/tr[2]/td[1]/a')$clickElement()
+      #gel all windows 
+      
+      remDr$switchToWindow(windows[[2]])
+      remDr$getCurrentWindowHandle()
+      remDr$getWindowHandles()
+      
+      currWindow <-  remDr$getCurrentWindowHandle()
+      windows <- remDr$getWindowHandles()
+      remDr$switchToFrame(NULL)
+      remDr$switchToWindow(NULL)
+      
+      remDr$switchToWindow("8401F29187C97BF8912191B64E04D05C")
+      
+      
+      #loop through switching child window 
+      for (window in windows) {
+        if (window != currWindow[[1]]) 
+          remDr$switchToWindow(window)
+      }
+      
+      #now do your stuff with child window 
+      remDr$closeall()
+      #now close your child window after doing all stuff
+      remDr$closeWindow()
+      
+      #now switch back to main window for further stuff 
+      remDr$switchToWindow(currWindow[[1]])
+      
+     
+     
+      
+      read_html(remDr$getPageSource(window)[[1]]) %>% 
+        html_elements("b")
+      
+      
+      
+      # Se obtiene el código y se guarda en una variable
+      html <- read_html(remDr$getPageSource()[[1]]) %>% 
+        html_elements(xpath = "/html/body/div/div/div[2]/table[3]")
+      
+      # Se obtienen los nombres de columna
+      
+      nomb.column <- html %>%
+        html_nodes("th.epcthl") %>%
+        html_text() %>% 
+        str_trim(side = "both") %>%
+        str_squish() %>% 
+        make.names()
+      
+      # Se obtiene el contenido
+      
+      contenido <- html %>% 
+        html_nodes("td.eptdl") %>%
+        html_text() %>% 
+        str_trim(side = "both") %>% 
+        str_squish()
+      
+      # Se realiza un df en blanco del largo de nomb.column
+      
+      assign("df0",data.frame(matrix(ncol = length(nomb.column))))
+      
+      # Se asignan los nombres de columna
+      # Se asigna el contenido al df
+      
+      colnames(df0) <- nomb.column
+      df0[nrow(df0),] <- contenido
+      
+      # Si existe "df_concursos" se le agrega df0
+      # si no existe, df0 será df_concursos
+      
+      ifelse(exists("df_concursos"),
+             assign("df_concursos",bind_rows(df0, df_concursos)),
+             assign("df_concursos", df0))
+      
+      # Se remueven las variables innecesarias
+      
+      rm(df0,nomb.column,contenido,html)
+      
+      # Se vuelve a la página anterior
+      
+      remDr$goBack()
+      
+      webElems <- remDr$findElements("tag name","frame")
+      
+      # Se aprecian los enlaces de frames existentes
+      
+      webElems <- remDr$findElements("name","mainFrame")
+      remDr$switchToFrame(webElems[[1]])
+      webElems2 <- remDr$findElements("name","rightFrame")
+      remDr$switchToFrame(webElems2[[1]])
+    }
+    
+    # Si el set de páginas es mayor a 1 el numero para hacer click en xpath
+    # cambia y aumenta de 1 (en el primer set es 1 para la pagina 2) a 3 y
+    # por esta razón después de que el set de páginas es mayor a 1, se suma 2
+    
+    if (i > 1) { 
+      ij <- ii+2
+    } else{
+      ij <- ii
+    }
+  }
+  
+  # Si i (set de páginas) es igual a "set_pags" entonces
+  # el webscrape terminó. De lo contrario dará click
+  # en el siguiente set de páginas
+  
+  if (i == set_pags) {
+    print("Webscrape terminado")
+  } else{
+    
+    # Para pasar el set de    
+    remDr$findElement("class name", "page02")$clickElement() 
+  }
+}
+
+remDr$closeall()

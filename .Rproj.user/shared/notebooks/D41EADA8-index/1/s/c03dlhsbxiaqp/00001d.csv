@@ -1,0 +1,8 @@
+"0","dat[,i] <- str_replace_all(dat[,i],'\\b(Los)\\b',""los"")
+"
+"2","Error in exists(cacheKey, where = .rs.WorkingDataEnv, inherits = FALSE) : 
+  invalid first argument
+"
+"2","Error in assign(cacheKey, frame, .rs.CachedDataEnv) : 
+  attempt to use zero-length variable name
+"

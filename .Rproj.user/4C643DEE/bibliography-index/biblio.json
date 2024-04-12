@@ -17,6 +17,30 @@
             },
             "title": "Información de SICOP",
             "type": ""
+        },
+        {
+            "ISSN": "1572-0314",
+            "author": [
+                {
+                    "family": "Jonge",
+                    "given": "Edwin De"
+                },
+                {
+                    "dropping-particle": "van der",
+                    "family": "Loo",
+                    "given": "Mark"
+                }
+            ],
+            "id": "datacleaningR",
+            "issued": {
+                "date-parts": [
+                    [
+                        2013
+                    ]
+                ]
+            },
+            "title": "An introduction to data cleaning with r",
+            "type": "book"
         }
     ],
     "project_biblios": []

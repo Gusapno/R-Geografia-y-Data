@@ -1,0 +1,4 @@
+"0","#| echo: false"
+"0","unique.institucion2 <- unique.institucion[c(1:5,65:70),]"
+"0","kbl(unique.institucion2) %>%"
+"0","  kable_styling(bootstrap_options = ""striped"", full_width = T, position = ""left"",font_size = 14)"

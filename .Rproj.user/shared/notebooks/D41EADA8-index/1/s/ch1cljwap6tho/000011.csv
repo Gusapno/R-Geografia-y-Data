@@ -1,0 +1,6 @@
+"0","a <- startsWith(unique.institucion$`Nombre de la institución`, ""M"")"
+"0","unique.institucion$value <- a"
+"0",""
+"0","data_filtrado <- data %>% # Se selecciona el set de datos"
+"0","  filter(str_detect(Nombre.de.la.institución, ""(?i)^m"")) # Se filtra por letra inicial"
+"0","rm(a)"

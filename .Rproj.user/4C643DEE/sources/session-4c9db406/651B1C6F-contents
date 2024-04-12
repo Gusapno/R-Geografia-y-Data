@@ -1,0 +1,154 @@
+#
+# This is the user-interface definition of a Shiny web application. You can
+# run the application by clicking 'Run App' above.
+#
+# Find out more about building applications with Shiny here:
+#
+#    http://shiny.rstudio.com/
+#
+library(bslib)
+library(shinydashboard)
+library(shiny)
+library(tidyverse)
+library(sf)
+library(leaflet)
+library(htmltools)
+library(rmapshaper)
+
+options(scipen=999)
+
+
+css <- HTML(
+  "#topScroll > .dataTables_wrapper.no-footer > .dataTables_scroll > .dataTables_scrollBody {
+  transform:rotateX(180deg);
+  }
+  #topScroll > .dataTables_wrapper.no-footer > .dataTables_scroll > .dataTables_scrollBody table{
+  transform:rotateX(180deg);
+   }"
+)
+
+addLegendCustom <- function(map, colors, labels, sizes, shapes, borders, opacity = 0.5){
+  
+  make_shapes <- function(colors, sizes, borders, shapes) {
+    shapes <- gsub("circle", "50%", shapes)
+    shapes <- gsub("square", "0%", shapes)
+    paste0(colors, "; width:", sizes, "px; height:", sizes, "px; border:3px solid ", borders, "; border-radius:", shapes)
+  }
+  make_labels <- function(sizes, labels) {
+    paste0("<div style='display: inline-block;height: ", 
+           sizes, "px;margin-top: 4px;line-height: ", 
+           sizes, "px;'>", labels, "</div>")
+  }
+  
+  legend_colors <- make_shapes(colors, sizes, borders, shapes)
+  legend_labels <- make_labels(sizes, labels)
+  
+  return(addLegend(map, colors = legend_colors, labels = legend_labels, opacity = opacity, position = "bottomright"))
+}
+
+unwanted_array <- list('Š'='S', 'š'='s', 'Ž'='Z', 'ž'='z', 'À'='A', 'Á'='A', 'Â'='A','Ã'='A', 'Ä'='A', 'Å'='A', 'Æ'='A', 'Ç'='C', 'È'='E', 'É'='E','Ê'='E', 'Ë'='E', 'Ì'='I', 'Í'='I', 'Î'='I', 'Ï'='I', 'Ò'='O', 'Ó'='O', 'Ô'='O', 'Õ'='O', 'Ö'='O', 'Ø'='O', 'Ù'='U','Ú'='U', 'Û'='U', 'Ü'='U', 'Ý'='Y', 'Þ'='B', 'ß'='Ss', 'à'='a', 'á'='a', 'â'='a', 'ã'='a','ä'='a','å'='a', 'æ'='a', 'ç'='c','è'='e', 'é'='e', 'ê'='e', 'ë'='e','ì'='i','í'='i', 'î'='i', 'ï'='i', 'ð'='o', 'ò'='o', 'ó'='o', 'ô'='o', 'õ'='o','ö'='o', 'ø'='o', 'ù'='u', 'ú'='u', 'û'='u', 'ý'='y', 'ý'='y', 'þ'='b', 'ÿ'='y' ) 
+
+meses <- c("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre")
+
+month <- as.character(c(1:12))
+
+df.mes <- data.frame(meses,month)
+
+#nomb.graf <- c("Tipo de modalidad","Estado del concurso","Clasificación del objeto","Tipo de procedimiento")
+
+# nomb.graf.ab <- c("count.modalidad","estado.concurso","clas.objeto","tipo.modalidad")
+
+# opc.graf <- data.frame(nomb.graf,nomb.graf.ab)
+
+int_breaks_rounded <- function(x, n = 5)  pretty(x, n)[round(pretty(x, n),1) %% 1 == 0]
+
+cant.sp <- sf::read_sf("LimiteCantonal5K_.shp")
+
+nombres <- unique(cant.sp$canton)
+
+data.sicop <- read.csv("TablaLimpiaSICOP_reducida.csv",fileEncoding = "windows-1252")
+names(data.sicop)[names(data.sicop) == 'Clasificación.del.objeto'] <- 'Clasificacion.del.objeto'
+data.sicop <- data.sicop[,c(-1,-19)]
+
+
+
+# data.sicop.sp <- read.csv("Tab_Cod_SICOP.csv",fileEncoding = "windows-1252")
+
+# data.sicop$fecha.hora.publicacion <- as.Date(data.sicop$Fecha.hora.de.publicación, "%d/%m/%Y %H:%M")
+
+
+cant.sp <- cant.sp %>% select(canton,provincia) %>% st_transform(crs = 4326)
+#cant.sp.nomb <- cant.sp.nomb, crs = 4326)
+
+data.sicop.presup <- data.sicop %>% group_by(Nombre) %>% 
+  summarise(presup.tot.est=sum(Presupuesto.total.estimado),
+            .groups = 'drop') %>%
+  as.data.frame()
+
+
+cant.sp <- rmapshaper::ms_simplify(input = as(cant.sp, 'Spatial'), keep = 0.5) %>%
+  st_as_sf()
+nombres.prov <- unique(cant.sp$provincia)
+
+rm(data.sicop.presup)
+
+
+navbarPage("Dashboard SICOP", id="nav",
+           
+           tabPanel("Mapa interactivo",
+                    div(class="outer",
+                        
+                        tags$head(
+                          # Include our custom CSS
+                          includeCSS("styles.css"),
+                          tags$style(HTML(css))
+                        ),
+                        
+                        # If not using custom CSS, set height of leafletOutput to a number instead of percent
+                        ################# MAPA
+                        
+                        leafletOutput("map", width = "100%", height = "67%"),
+                        
+                        ################# PANEL DE PROVINCIA Y CANTON
+                        absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
+                                      draggable = TRUE, top = 80, left = "auto", right = 20,
+                                      width = 350, height = "auto",
+                                      selectInput('prov','Seleccionar provincia',unique(cant.sp$provincia),
+                                                  selected = as.character(cant.sp$provincia[[sample(1:7,1)]]),
+                                                  selectize = F),
+                                      uiOutput("secondSelection"),
+                                      htmlOutput("texto.canton")
+                                      
+                        ),
+                        ################# PANEL DE GRAFICOS
+                        absolutePanel(id = "controls", class = "panel panel-default", fixed = TRUE,
+                                      draggable = TRUE, top = 420, left = 20, right = "auto",
+                                      width = 550, height = 250,
+                                      plotOutput("count", height = "100%",width = "100%")),
+                       
+                        fixedPanel(
+                          wellPanel(div(DT::dataTableOutput("data.sicop.dt"))),
+                          style = "z-index: 10; left:0; right:0; overflow-y:auto; overflow-x:auto; height:35%;"
+                          ,height = "33%"),
+                  
+                        
+                        tags$div(id="cite",'Elaborado con datos de:',
+                                 tags$em('Instituto Geográfico Nacional (2021) y SICOP (2023).'),
+                                 'En https://www.snitcr.go.cr y https://www.sicop.go.cr/index.jsp')
+    )
+  ),
+  tabPanel("Visor de datos",
+           fluidRow(
+             column(3,
+                 selectInput('canton1','Seleccionar cantón',choices = nombres, selectize = F),
+             ),
+             column(3,
+                    p(class = 'text-center', downloadButton('df2', 'Descargar datos filtrados'))
+             ),
+           hr(),
+           DT::dataTableOutput("data.sicop.dt2")
+           )
+    )
+  )
+
+

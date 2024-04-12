@@ -1,0 +1,258 @@
+#
+# This is the server logic of a Shiny web application. You can run the
+# application by clicking 'Run App' above.
+#
+# Find out more about building applications with Shiny here:
+#
+#    http://shiny.rstudio.com/
+#
+library(bslib)
+library(shinydashboard)
+library(shiny)
+library(tidyverse)
+library(sf)
+library(leaflet)
+library(gsubfn)
+library(data.table)
+options(scipen=999)
+
+
+############ PARA AÑADIR SIMBOLOGÍA CUSTOM
+addLegendCustom <- function(map, colors, labels, sizes, shapes, borders, opacity = 0.5){
+  
+  make_shapes <- function(colors, sizes, borders, shapes) {
+    shapes <- gsub("circle", "50%", shapes)
+    shapes <- gsub("square", "0%", shapes)
+    paste0(colors, "; width:", sizes, "px; height:", sizes, "px; border:3px solid ", borders, "; border-radius:", shapes)
+  }
+  make_labels <- function(sizes, labels) {
+    paste0("<div style='display: inline-block;height: ", 
+           sizes, "px;margin-top: 4px;line-height: ", 
+           sizes, "px;'>", labels, "</div>")
+  }
+  
+  legend_colors <- make_shapes(colors, sizes, borders, shapes)
+  legend_labels <- make_labels(sizes, labels)
+  
+  return(addLegend(map, colors = legend_colors, labels = legend_labels, opacity = opacity, position = "bottomright"))
+}
+
+
+
+############ PARA ELIMINAR LAS TILDES EN LA BÚSQUEDA DE DATOS
+
+
+unwanted_array <- list('Š'='S', 'š'='s', 'Ž'='Z', 'ž'='z', 'À'='A', 'Á'='A', 'Â'='A','Ã'='A', 'Ä'='A', 'Å'='A', 'Æ'='A', 'Ç'='C', 'È'='E', 'É'='E','Ê'='E', 'Ë'='E', 'Ì'='I', 'Í'='I', 'Î'='I', 'Ï'='I', 'Ò'='O', 'Ó'='O', 'Ô'='O', 'Õ'='O', 'Ö'='O', 'Ø'='O', 'Ù'='U','Ú'='U', 'Û'='U', 'Ü'='U', 'Ý'='Y', 'Þ'='B', 'ß'='Ss', 'à'='a', 'á'='a', 'â'='a', 'ã'='a','ä'='a','å'='a', 'æ'='a', 'ç'='c','è'='e', 'é'='e', 'ê'='e', 'ë'='e','ì'='i','í'='i', 'î'='i', 'ï'='i', 'ð'='o', 'ò'='o', 'ó'='o', 'ô'='o', 'õ'='o','ö'='o', 'ø'='o', 'ù'='u', 'ú'='u', 'û'='u', 'ý'='y', 'ý'='y', 'þ'='b', 'ÿ'='y' ) 
+
+# Se crea un data frame con los meses y el ID
+df.mes <- data.frame(meses = c("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"),
+                     month = as.character(c(1:12)))
+
+
+# Función para redondar el resultado de los ggplot2
+int_breaks_rounded <- function(x, n = 5)  pretty(x, n)[round(pretty(x, n),1) %% 1 == 0]
+
+# Se leen los datos de cantón
+cant.sp <- sf::read_sf("LimiteCantonal5K_.shp")
+
+# Se leen los datos de tabla SICOP
+data.sicop <- read.csv("TablaLimpiaSICOP_reducida.csv",fileEncoding = "windows-1252")
+
+# Se quita la tilda en ese nombre de columna específico
+names(data.sicop)[names(data.sicop) == 'Clasificación.del.objeto'] <- 'Clasificacion.del.objeto'
+
+# Se remueven columnas innecesarias
+data.sicop <- data.sicop[,c(-1,-19)]
+
+# Se asigna nueva proyección a la capa de cantones
+cant.sp <- cant.sp %>% select(canton,provincia) %>% st_transform(crs = 4326)
+
+# Se extrae el presupuesto de cantón para añadirlo a la capa de cantón
+# Esto para visualizar el dato de inversión al clickear en el mapa
+data.sicop.presup <- data.sicop %>% group_by(Nombre) %>% 
+  summarise(presup.tot.est=sum(Presupuesto.total.estimado),
+            .groups = 'drop') %>%
+             as.data.frame()
+
+# Para facilitar el join de lo obtenido, se crea una columna sin tildes para unirlas con data.sicop.presup
+cant.sp$canton.sint <- gsubfn::gsubfn(paste(names(unwanted_array),collapse='|'),unwanted_array,as.character(cant.sp$canton))
+
+# Se añade una columna de País, aunque aun no le tengo ningún uso
+cant.sp$pais <- rep("Costa Rica", n = length(cant.sp$canton))
+
+# Se añade el mismo nombre de columna para facilitar el join
+colnames(data.sicop.presup) <- c("canton.sint","presup.tot.est")
+
+# Se realiza el join
+cant.sp <- left_join(cant.sp,data.sicop.presup, by = "canton.sint")
+
+# Se simplifica la capa de cantón (aunque ya la había simplificado anteriormente)
+cant.sp <- rmapshaper::ms_simplify(input = as(cant.sp, 'Spatial'), keep = 1) %>% st_as_sf()
+
+# nombres.prov <- unique(cant.sp$provincia)
+
+# Se remueve el df que ya no es necesario
+rm(data.sicop.presup)
+
+# Se asigna formato de fecha
+data.sicop[,"fecha.hora.publicacion"] <- as.Date(data.sicop[,"Fecha.hora.de.publicación"], "%d/%m/%Y %H:%M")
+#data.sicop$fecha.hora.publicacion <- as.Date(data.sicop$Fecha.hora.de.publicación, "%d/%m/%Y %H:%M")
+
+bbox.canton <- st_bbox(cant.sp)
+# Define server logic required to draw a histogram
+function(input, output, session) {
+  ##### OUTPUT MAP
+  output$map <- renderLeaflet({
+    leaflet() %>% addTiles() %>% 
+      addPolygons(data = cant.sp,color = "green",weight = 3) %>% 
+      fitBounds(bbox.canton[[1]], bbox.canton[[2]], bbox.canton[[3]], bbox.canton[[4]]) %>% 
+      addLegendCustom("bottomright",
+                      color = "white; width:20px; height:20px; border:3px solid white; border-radius:0%",
+                      label = "<div style='display: inline-block;height: 20px;margin-top: 4px;line-height: 20px;'>Límite Cantonal</div>",
+                      size = 20,
+                      borders = "green")
+  })
+  ## POPUP
+  observe({
+    # set text for the clickable popup labels
+    popup <- paste0("<strong>Provincia: </strong>",cant.sp$provincia,"<br><strong>","Cantón: </strong>",
+                    cant.sp$canton,"<br><strong>","Presupuesto total: </strong>₡",formatC(cant.sp$presup.tot.est,format="d", big.mark=',')
+    )
+  })
+  ## Para añadir segunda selección
+observe({
+  output$secondSelection <- renderUI({
+  selectInput("canton","Cantón",choices = unique(cant.sp$canton[cant.sp$provincia == input$prov]),
+              selected = cant.sp$canton[cant.sp$provincia == as.character(input$prov)][[1]],
+              selectize = F)
+})})
+  
+  
+data.filter.reactive <- reactive({
+    canton <- gsubfn(paste(names(unwanted_array),collapse='|'), 
+                     unwanted_array,input$canton)
+    data.sicop[data.sicop$Nombre == canton,]
+})
+observe({print(input$canton)})
+
+observe({ if(length(input$canton) == 0){
+  print("Aun no...")
+} else{
+  data.sicop.filter <- data.filter.reactive()
+    ###### TEXTO
+    output$texto.canton <- renderText({
+    if (nrow(data.sicop.filter) == 0) {
+        print(paste0("Sin información disponible para el cantón de ", input$canton))
+    } else if (nrow(data.sicop.filter) ==  1) {
+      aa <- paste("En el cantón de ",input$canton," hay:","<br>",
+                  "- ", nrow(data.sicop.filter)," licitación","<br>",
+                  "- inversión total de ₡", 
+             formatC(sum(data.sicop.filter$Presupuesto.total.estimado), 
+                     format = "d",big.mark = ","), " colones")
+      htmltools::HTML(aa)
+    } else{
+       aa <- print(paste0("En el cantón de ", input$canton, " hay un total de:", "<br>", "- ",nrow(data.sicop.filter), " licitaciones","<br>",
+                          "- inversión total de ₡", 
+                     formatC(sum(data.sicop.filter$Presupuesto.total.estimado), format = "d",big.mark = ","), " colones"))
+       htmltools::HTML(aa)
+    }})
+  }
+})
+  ## GRÁFICOS 
+observe({ if(length(input$canton) == 0){
+  print("Aun no...")
+} else{
+  data.sicop.filter <- data.filter.reactive()
+    ##### COUNT ESTADO DEL CONCURSO
+    output$count <- renderPlot({
+        data.dt <- data.table::data.table(data.sicop.filter) # doemato data table
+        a <- data.dt[, .N, by=.(year(fecha.hora.publicacion),month(fecha.hora.publicacion))] # se contea por mes y año
+      if (nrow(a) != 0) {
+        a$month <- as.character(a$month) # se convierte a character
+        a$month <- factor(a$month, levels = a$month) #se ordena por niveles
+        a$year <- as.character(a$year) # se convierte a character
+        for (i in 1:length(a$month)) {
+          check <- as.integer(levels(a$month[i])[i]) # se checa el numero de mes
+          check2 <- which(df.mes$month == check) # se identifica cual tiene ese numero de mes
+          a$mes[i] <- df.mes[check2,1]  # se agrega
+        }
+        a$mes <- factor(a$mes, levels = a$mes) # se ordena por año
+        # GRÁFICO
+        a %>% 
+          ggplot(aes(x = mes, y = N, fill = year)) + 
+          geom_bar(position = "dodge",stat = "identity") +
+          scale_fill_manual(values = c("lightblue", "lightgreen"),name = "Año") +
+          scale_y_continuous(name = "Cantidad",breaks = int_breaks_rounded) +
+          ggtitle("Cantidad de licitaciones por mes") +
+          xlab("Mes") +
+          theme_classic(base_size = 15)
+      } else {
+        par(mar = c(0,0,0,0))
+        plot(c(0, 1), c(0, 1), ann = F, bty = 'n', type = 'n', xaxt = 'n', yaxt = 'n')
+        text(x = 0.5, y = 0.5, "Sin datos disponibles", cex = 1.6, col = "black")
+      } # else
+    }) # render plot
+    ##### ZOOM
+    zoom <-reactive({
+      subset(cant.sp, provincia == input$prov)
+      subset(cant.sp, canton == input$canton)
+    })
+    ##### OBSERVE AND HIGHLIGHT
+    observe({
+      if(input$canton!=""){
+        proxy <- leafletProxy("map")
+        proxy %>% clearGroup("highlight")
+        
+        proxy %>%
+          flyToBounds(st_bbox(zoom())[[1]], st_bbox(zoom())[[2]], st_bbox(zoom())[[3]], st_bbox(zoom())[[4]])
+        
+        proxy %>% 
+          addPolylines(stroke=TRUE, weight = 7,color="yellow",data=zoom(),group="highlight")
+      }
+    })    
+    
+  } # else abajo de "Aun no"
+}) # se cierra el observe
+observe({if(length(input$canton) == 0){
+  print("Aun no...")
+} else {
+  output$data.sicop.dt <- DT::renderDataTable({
+    df <- data.filter.reactive()
+    if (nrow(df > 0)) {
+      df$Presupuesto.total.estimado <-formatC(df$Presupuesto.total.estimado,format="d", big.mark=',')
+    }
+    action <- DT::dataTableAjax(session, df, outputId = "data.sicop.dt")
+    DT::datatable(df,options = list(zeroRecords = "No records to display - custom text", ajax = list(url = action),lengthChange = FALSE, searching = FALSE, pageLength = 3,initComplete = JS(
+      "function(settings, json) {",
+      "$(this.api().table().container()).css({'font-size': '10px'});",
+      "$(this.api().table().header()).css({'background-color': '#517fb9', 'color': '#fff'});",
+      "}"),autoWidth = T,scrollY = T, scrollX = T),class = 'cell-border stripe')
+  })
+}})
+###### VISOR DE DATOS
+
+  output$data.sicop.dt2<- DT::renderDataTable({
+    canton <- input$canton1
+    canton <- gsubfn::gsubfn(paste(names(unwanted_array),collapse='|'), 
+                     unwanted_array,canton)
+    df <- data.sicop[data.sicop$Nombre == canton,]
+    action <- DT::dataTableAjax(session, df, outputId = "data.sicop.dt")
+    DT::datatable(df,options = list(ajax = list(url = action),initComplete = JS(
+      "function(settings, json) {",
+      "$(this.api().table().container()).css({'font-size': '12px'});",
+      "$(this.api().table().header()).css({'background-color': '#517fb9', 'color': '#fff'});",
+      "}"),scrollY = T, scrollX = T,dom = "tB"),class = 'cell-border stripe')
+  })
+observe({
+  output$df2 <- downloadHandler(
+    filename = "Filtered Data.csv",
+    content = function(file){
+      canton <- input$canton1
+      canton <- gsubfn::gsubfn(paste(names(unwanted_array),collapse='|'), 
+                       unwanted_array,canton)
+      df <- data.sicop[data.sicop$Nombre == canton,]
+      write.csv(df[input[["data.sicop.dt_rows_all"]], ],
+                file)})
+})
+}
+

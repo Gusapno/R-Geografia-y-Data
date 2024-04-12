@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.269">
+<meta name="generator" content="quarto-1.3.353">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -17,7 +17,7 @@ div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
   width: 0.8em;
-  margin: 0 0.8em 0.2em -1.6em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
 </style>
@@ -90,6 +90,7 @@ ul.task-list li input[type="checkbox"] {
   })
   </script>
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <link rel="stylesheet" href="styles.css">
@@ -106,27 +107,29 @@ ul.task-list li input[type="checkbox"] {
     <span class="navbar-title">R, Geografía y Data</span>
     </a>
   </div>
+            <div id="quarto-search" class="" title="Search"></div>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./about.html">
+    <a class="nav-link" href="./about.html" rel="" target="">
  <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/Gusapno"><i class="bi bi-github" role="img">
+    <a class="nav-link" href="https://github.com/Gusapno" rel="" target=""><i class="bi bi-github" role="img">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://twitter.com/Gabo06719007"><i class="bi bi-twitter" role="img">
+    <a class="nav-link" href="https://twitter.com/Gabo06719007" rel="" target=""><i class="bi bi-twitter" role="img">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
 </ul>
-              <div id="quarto-search" class="" title="Search"></div>
+            <div class="quarto-navbar-tools">
+</div>
           </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
     </nav>
@@ -151,9 +154,10 @@ ul.task-list li input[type="checkbox"] {
   </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
 <!-- sidebar -->
   
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(1)</span></div><div class="category" data-category="RSelenium">RSelenium <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Webscraping">Webscraping <span class="quarto-category-count">(1)</span></div><div class="category" data-category="analysis">analysis <span class="quarto-category-count">(1)</span></div></div></div>
+    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(4)</span></div><div class="category" data-category="RSelenium">RSelenium <span class="quarto-category-count">(2)</span></div><div class="category" data-category="SIG">SIG <span class="quarto-category-count">(2)</span></div><div class="category" data-category="Webscraping">Webscraping <span class="quarto-category-count">(2)</span></div><div class="category" data-category="analysis">analysis <span class="quarto-category-count">(1)</span></div><div class="category" data-category="limpieza de datos">limpieza de datos <span class="quarto-category-count">(1)</span></div></div></div>
 <!-- main -->
 <main class="content quarto-banner-title-block column-page-left" id="quarto-document-content">
 
@@ -166,9 +170,85 @@ ul.task-list li input[type="checkbox"] {
 
 <div class="quarto-listing quarto-listing-container-default" id="listing-listing">
 <div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="Webscraping,RSelenium,analysis" data-listing-date-sort="1671775200000" data-listing-file-modified-sort="1674453195902" data-listing-reading-time-sort="20.87">
+<div class="quarto-post image-right" data-index="0" data-categories="SIG" data-listing-date-sort="1711173600000" data-listing-file-modified-sort="1712883958489" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="9">
 <div class="thumbnail">
-<p><a href="./posts/SICOP/index.html"> <img src="./posts/SICOP/image.jpg" class="thumnail-image"> </a></p>
+<p><a href="./posts/SICOP_Representacion/index.html"> <img src="./posts/SICOP_Representacion/image.jpg" class="thumbnail-image"> </a></p>
+</div>
+<div class="body">
+<a href="./posts/SICOP_Representacion/index.html">
+<h3 class="no-anchor listing-title">
+Representación de datos
+</h3>
+<div class="listing-subtitle">
+
+</div>
+</a>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('SIG'); return false;">
+SIG
+</div>
+</div>
+<a href="./posts/SICOP_Representacion/index.html">
+<div class="listing-description">
+La representación de datos es una técnica utilizada para obtener…
+</div>
+</a>
+</div>
+<div class="metadata">
+<a href="./posts/SICOP_Representacion/index.html">
+<div class="listing-date">
+Mar 23, 2024
+</div>
+<div class="listing-author">
+Gabriel Ramírez
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="1" data-categories="Webscraping,RSelenium,limpieza de datos" data-listing-date-sort="1710050400000" data-listing-file-modified-sort="1712884024707" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="9">
+<div class="thumbnail">
+<p><a href="./posts/SICOP_Limpieza/index.html"> <img src="./posts/SICOP_Limpieza/image.jpg" class="thumbnail-image"> </a></p>
+</div>
+<div class="body">
+<a href="./posts/SICOP_Limpieza/index.html">
+<h3 class="no-anchor listing-title">
+Limpieza de datos scrapeados con R
+</h3>
+<div class="listing-subtitle">
+
+</div>
+</a>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('Webscraping'); return false;">
+Webscraping
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('RSelenium'); return false;">
+RSelenium
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('limpieza de datos'); return false;">
+limpieza de datos
+</div>
+</div>
+<a href="./posts/SICOP_Limpieza/index.html">
+<div class="listing-description">
+La limpieza y/o preparación de datos es una parte esencial del análisis estadístico. Usualmente esto toma más tiempo que el análisis estadístico como tal; usualmente en los…<span class="citation" data-cites="datacleaningR"></span>
+</div>
+</a>
+</div>
+<div class="metadata">
+<a href="./posts/SICOP_Limpieza/index.html">
+<div class="listing-date">
+Mar 10, 2024
+</div>
+<div class="listing-author">
+Gabriel Ramírez
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="2" data-categories="Webscraping,RSelenium,analysis" data-listing-date-sort="1671775200000" data-listing-file-modified-sort="1674453195902" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="21">
+<div class="thumbnail">
+<p><a href="./posts/SICOP/index.html"> <img src="./posts/SICOP/image.jpg" class="thumbnail-image"> </a></p>
 </div>
 <div class="body">
 <a href="./posts/SICOP/index.html">
@@ -200,6 +280,41 @@ En este proyecto se obtienen datos del Sistema Integrado de Compras Públicas (S
 <a href="./posts/SICOP/index.html">
 <div class="listing-date">
 Dec 23, 2022
+</div>
+<div class="listing-author">
+Gabriel Ramírez
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="3" data-categories="SIG" data-listing-date-sort="1648879200000" data-listing-file-modified-sort="1712884045394" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="12">
+<div class="thumbnail">
+<p><a href="./posts/OSM_ScrapePuntos/index.html"> <img src="./posts/OSM_ScrapePuntos/image.jpg" class="thumbnail-image"> </a></p>
+</div>
+<div class="body">
+<a href="./posts/OSM_ScrapePuntos/index.html">
+<h3 class="no-anchor listing-title">
+Webscrape de puntos de Open Street Map (OSM)
+</h3>
+<div class="listing-subtitle">
+
+</div>
+</a>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('SIG'); return false;">
+SIG
+</div>
+</div>
+<a href="./posts/OSM_ScrapePuntos/index.html">
+<div class="listing-description">
+Open Street Map (OSM) es una base de datos geográfica gratis que es actualizada y mantenida de forma colaborativa. Estos datos son capturados con dispositivos GPS…
+</div>
+</a>
+</div>
+<div class="metadata">
+<a href="./posts/OSM_ScrapePuntos/index.html">
+<div class="listing-date">
+Apr 2, 2022
 </div>
 <div class="listing-author">
 Gabriel Ramírez
@@ -239,9 +354,23 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     icon: icon
   };
   anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
   const clipboard = new window.ClipboardJS('.code-copy-button', {
-    target: function(trigger) {
-      return trigger.previousElementSibling;
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
     }
   });
   clipboard.on('success', function(e) {
@@ -306,6 +435,92 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return note.innerHTML;
     });
   }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
   const findCites = (el) => {
     const parentEl = el.parentElement;
     if (parentEl) {

@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.353">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Gabriel Ramírez">
+
+<title>R, Geografía y Data - Limpieza de datos scrapeados con R</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "Sin resultados",
+    "search-matching-documents-text": "documentos encontrados",
+    "search-copy-link-title": "Copiar el enlace en la búsqueda",
+    "search-hide-matches-text": "Ocultar resultados adicionales",
+    "search-more-match-text": "resultado adicional en este documento",
+    "search-more-matches-text": "resultados adicionales en este documento",
+    "search-clear-button-title": "Borrar",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar"
+  }
+}</script>
+
+<script src="../../site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="../../site_libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">R, Geografía y Data</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Buscar"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Navegación de palanca" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html" rel="" target="">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/Gusapno" rel="" target=""><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/Gabo06719007" rel="" target=""><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Limpieza de datos scrapeados con R</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">Webscraping</div>
+                <div class="quarto-category">RSelenium</div>
+                <div class="quarto-category">limpieza de datos</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Autor/a</div>
+      <div class="quarto-title-meta-contents">
+               <p>Gabriel Ramírez </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Fecha de publicación</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">23 de diciembre de 2022</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Contenidos</h2>
+   
+  <ul>
+  <li><a href="#sobre-la-limpieza-y-preparación-de-datos" id="toc-sobre-la-limpieza-y-preparación-de-datos" class="nav-link active" data-scroll-target="#sobre-la-limpieza-y-preparación-de-datos">Sobre la limpieza y preparación de datos</a></li>
+  <li><a href="#búsqueda-de-inconsistencias" id="toc-búsqueda-de-inconsistencias" class="nav-link" data-scroll-target="#búsqueda-de-inconsistencias">Búsqueda de inconsistencias</a>
+  <ul class="collapse">
+  <li><a href="#manipulación-de-carácteres-y-normalización" id="toc-manipulación-de-carácteres-y-normalización" class="nav-link" data-scroll-target="#manipulación-de-carácteres-y-normalización">Manipulación de carácteres y normalización</a></li>
+  </ul></li>
+  <li><a href="#búsqueda-y-localización-de-errores" id="toc-búsqueda-y-localización-de-errores" class="nav-link" data-scroll-target="#búsqueda-y-localización-de-errores">Búsqueda y localización de errores</a>
+  <ul class="collapse">
+  <li><a href="#conversiones-de-tipos" id="toc-conversiones-de-tipos" class="nav-link" data-scroll-target="#conversiones-de-tipos">Conversiones de tipos</a></li>
+  </ul></li>
+  <li><a href="#códigos-de-cantón" id="toc-códigos-de-cantón" class="nav-link" data-scroll-target="#códigos-de-cantón">Códigos de cantón</a></li>
+  <li><a href="#retoques-adicionales-a-la-tabla-limpia" id="toc-retoques-adicionales-a-la-tabla-limpia" class="nav-link" data-scroll-target="#retoques-adicionales-a-la-tabla-limpia">Retoques adicionales a la tabla limpia</a></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="sobre-la-limpieza-y-preparación-de-datos" class="level1">
+<h1>Sobre la limpieza y preparación de datos</h1>
+<p>La limpieza y/o preparación de datos es una parte esencial del análisis estadístico. Usualmente esto toma más tiempo que el análisis estadístico como tal; usualmente en los ejercicios y ejemplos de análisis estadísticos se asume que los datos tienen una estructura adecuada para el análisis pero en la práctica suele ser necesario preparar el set de datos antes de realizar un análisis a los mismos <span class="citation" data-cites="datacleaningR">(<a href="#ref-datacleaningR" role="doc-biblioref">Jonge &amp; Loo, 2013</a>)</span>.</p>
+<p>Un set de datos técnicamente correcto se entiende como uno en el que cada valor: se puede reconocer que pertenece a cierta variable, es almacenado en un tipo de dato que representa el dominio de valores de la variable en la vida real; es decir, para cada tipo de valor, su variable debe pertenecer a su tipo adecuado (una de texto a una de texto, una numérica a una numérica, etc…). <span class="citation" data-cites="datacleaningR">Jonge &amp; Loo (<a href="#ref-datacleaningR" role="doc-biblioref">2013</a>)</span> define un set de datos técnicamente correcto como un set en el que: es almacenada en un <code>data.frame</code> con columnas adecuadas y cada columna del <code>data.frame</code> es de un tipo que representa adecuadamente el dominio de valores de su variable.</p>
+<p>El contenido de un set de datos podría ser no consistente, lo cual puede devenir en errores de análisis. Entre los posibles errores se encuentra el hecho de escribir la misma palabra de formas diferentes, la codificación del texto (por ejemplo, UTF-8), valores faltantes, outliers, valores especiales e incluso espacios en blanco innecesarios en una palabra o oración.</p>
+<p>Para lograr la consistencia en la data es posible: detectar las inconsistencias, seleccionar los campos que causan las inconsistencias y la corrección de estos campos ya sea mediante métodos determinísticos (modelos) o estocásticos.</p>
+</section>
+<section id="búsqueda-de-inconsistencias" class="level1">
+<h1>Búsqueda de inconsistencias</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Directorio de trabajo</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">setwd</span>(<span class="st">"~/GitHub/R-Geografia-y-Data/posts/SICOP_Limpieza"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Paquetes a utilizar</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(reshape2)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(magrittr)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(kableExtra)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringi)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scraEP) <span class="co"># Para remover acentos</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gsubfn)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Datos a utilizar</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"csv/ConcursosSICOP.csv"</span>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> data[,<span class="sc">-</span><span class="dv">1</span>]</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Una forma básica de conocer la estructura básica del set de datos es utilizar <code>str()</code>, aunque en este caso se utiliza un método diferente para facilitar la visualización de la estructura de los datos.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>str <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">variable =</span> <span class="fu">names</span>(data),</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">classe =</span> <span class="fu">sapply</span>(data, typeof),</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">first_values =</span> <span class="fu">sapply</span>(data, <span class="cf">function</span>(x) <span class="fu">paste0</span>(<span class="fu">head</span>(x),  <span class="at">collapse =</span> <span class="st">", "</span>)),</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>           <span class="at">row.names =</span> <span class="cn">NULL</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(str) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Columna"</span>,<span class="st">"Tipo"</span>,<span class="st">"Primeros valores"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-striped table-sm small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Columna</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Tipo</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Primeros valores</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">22</td>
+<td style="text-align: left;">Cierre.de.recepción.de.ofertas</td>
+<td style="text-align: left;">character</td>
+<td style="text-align: left;">08/08/2022 10:00, 31/08/2022 15:00, 03/08/2022 08:45, 27/07/2022 09:00, 30/08/2022 17:00, 28/07/2022 10:00</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">23</td>
+<td style="text-align: left;">Fecha.hora.de.apertura.de.ofertas</td>
+<td style="text-align: left;">character</td>
+<td style="text-align: left;">08/08/2022 10:00, 31/08/2022 15:00, 03/08/2022 09:00, 27/07/2022 09:00, 30/08/2022 17:10, 28/07/2022 10:00</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">24</td>
+<td style="text-align: left;">Plazo.del.acto.final</td>
+<td style="text-align: left;">character</td>
+<td style="text-align: left;">60 Días hábiles, 20 Días hábiles, 24 Días hábiles, 20 Días hábiles, 53 Días hábiles, 6 Días hábiles</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">25</td>
+<td style="text-align: left;">Presupuesto.total.estimado</td>
+<td style="text-align: left;">character</td>
+<td style="text-align: left;">283.767,29 [CRC], 17.746.000 [CRC], 24.000.000 [CRC], 1.000.000 [CRC], 163.797.963,12 [CRC], 405.000 [CRC]</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">26</td>
+<td style="text-align: left;">Presupuesto.total.estimado.USD..Opcional.</td>
+<td style="text-align: left;">character</td>
+<td style="text-align: left;">, , , , 241.419 [USD],</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">27</td>
+<td style="text-align: left;">Fundamento.jurídico</td>
+<td style="text-align: left;">character</td>
+<td style="text-align: left;">NA, NA, NA, NA, NA, Contratación directa por escasa cuantía (art.2 inc. h) LCA y art. 144 RLCA)</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Nota sobre la tabla
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Únicamente se muestran algunos valores de la tabla para facilitar la lectura.</p>
+</div>
+</div>
+<p>En este caso se aprecia que los formatos de variable no corresponden necesariamente a un tipo adecuado para el análisis. Las fechas y el presupuesto poseen formato de tipo <code>character</code>, cuando el formato adecuado sería fecha (<code>date</code>) y numérico (<code>double</code>) respectivamente.</p>
+<p>También es posible buscar los valores únicos en columnas de interés, así como en el Estado del Concurso y Nombre de la institución.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>unique.estado <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">sort</span>(<span class="fu">unique</span>(data<span class="sc">$</span>Estado.del.concurso)))</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>unique.estado<span class="sc">$</span>id <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">dim</span>(unique.estado)[<span class="dv">1</span>])</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(unique.estado) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Estado del concurso"</span>,<span class="st">"id"</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># sort(unique(data$Nombre.de.la.institución))</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-striped table-sm small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Estado del concurso</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">id</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Adjudicación en firme</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Adjudicado</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Apelación o Revocación</td>
+<td style="text-align: right;">4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Contrato</td>
+<td style="text-align: right;">5</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Desierto/Infructuoso</td>
+<td style="text-align: right;">6</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">En apertura</td>
+<td style="text-align: right;">7</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">En evaluación</td>
+<td style="text-align: right;">8</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">En recepción de ofertas</td>
+<td style="text-align: right;">9</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Nulidad absoluta</td>
+<td style="text-align: right;">10</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Objetado</td>
+<td style="text-align: right;">11</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Publicado</td>
+<td style="text-align: right;">12</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+<p>En el caso de la columna con el estado del concurso la estructura parece ser consistente por lo tanto no será necesario realizar algún tiempo de limpieza o preparación. Se visualizan los primeros y los últimos 5 elementos (de en total 70 elementos).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>unique.institucion <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">sort</span>(<span class="fu">unique</span>(data<span class="sc">$</span>Nombre.de.la.institución)))</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>unique.institucion<span class="sc">$</span>id <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">dim</span>(unique.institucion)[<span class="dv">1</span>])</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(unique.institucion) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Nombre de la institución"</span>,<span class="st">"id"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-striped table-sm small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Nombre de la institución</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">id</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">Instituto Costarricense de Puertos del Pacífico</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">INSTITUTO DE FOMENTO Y ASESORIA MUNICIPAL</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">MUNICIPALIDAD DE ACOSTA</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">Municipalidad de Alajuela</td>
+<td style="text-align: right;">4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">MUNICIPALIDAD DE ALVARADO DE PACAYAS</td>
+<td style="text-align: right;">5</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">65</td>
+<td style="text-align: left;">MUNICIPALIDAD DE TURRIALBA</td>
+<td style="text-align: right;">65</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">66</td>
+<td style="text-align: left;">Municipalidad de Turrubares</td>
+<td style="text-align: right;">66</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">67</td>
+<td style="text-align: left;">MUNICIPALIDAD DE UPALA</td>
+<td style="text-align: right;">67</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">68</td>
+<td style="text-align: left;">Municipalidad de Zarcero</td>
+<td style="text-align: right;">68</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">69</td>
+<td style="text-align: left;">Municipalidad del Cantón de Flores</td>
+<td style="text-align: right;">69</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">70</td>
+<td style="text-align: left;">Unión Nacional de Gobiernos Locales</td>
+<td style="text-align: right;">70</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+<p>Se aprecia que hay elementos que no corresponden a una Municipalidad y también inconsistencias en la forma de escribir las nombres de cada Municipalidad (uso de mayúsculas). Para eliminar los elementos que no corresponden a una Municipalidad, se buscan todos los elementos que empiezan con <code>"M"</code> . Esto se realiza después de revisar los contenidos de la tabla y confirmar que todos los elementos que comienzan con <code>"M"</code> son municipalidades.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="fu">startsWith</span>(unique.institucion<span class="sc">$</span><span class="st">`</span><span class="at">Nombre de la institución</span><span class="st">`</span>, <span class="st">"M"</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>unique.institucion<span class="sc">$</span>value <span class="ot">&lt;-</span> a</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>data_filtrado <span class="ot">&lt;-</span> data <span class="sc">%&gt;%</span> <span class="co"># Se selecciona el set de datos</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">str_detect</span>(Nombre.de.la.institución, <span class="st">"(?i)^m"</span>)) <span class="co"># Se filtra por letra inicial</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(a,data)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Con esto se obtienen los valores que inician con <code>M</code>. Además se agrega una columna para visualizar y filtrar rápidamente cuales son esos valores que no inician con <code>M</code>. En este caso se trata de:</p>
+<ul>
+<li><p>Instituto Costarricense de Puertos del Pacífico</p></li>
+<li><p>INSTITUTO DE FOMENTO Y ASESORIA MUNICIPAL</p></li>
+<li><p>Unión Nacional de Gobiernos Locales</p></li>
+</ul>
+<p>Dado que no entran en el análisis de interés, se descartan completamente del set de datos.</p>
+<section id="manipulación-de-carácteres-y-normalización" class="level2">
+<h2 class="anchored" data-anchor-id="manipulación-de-carácteres-y-normalización">Manipulación de carácteres y normalización</h2>
+<p>Dadas que las personas pueden escribir las mismas cosas de formas diferentes, los datos de tipo <code>carácter/character</code> se pueden volver complicados de procesar. Esto también incluye la posibilidad de espacios en blanco innecesarios (al inicio, entre o al final de las palabras). Este proceso se realiza en</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Se renombra el encargado de publicación de gestión de objerciones y apertura</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># por un nombre corto</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(data_filtrado)[<span class="dv">9</span>] <span class="ot">&lt;-</span> <span class="st">"Enc.Pub.Gest.Apertu"</span> </span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Se renombra el encargado de solicitar estudio de ofertas recomendación del acto final</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co"># por un nombre corto</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(data_filtrado)[<span class="dv">11</span>] <span class="ot">&lt;-</span> <span class="st">"Enc.Solic.Est.Ofert"</span> </span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Se remueve texto innecesario (se identificó observando el set de datos)</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>data_filtrado<span class="sc">$</span>Nombre.de.la.institución <span class="ot">&lt;-</span> <span class="fu">str_remove</span>(data_filtrado<span class="sc">$</span>Nombre.de.la.institución, <span class="st">"(?i)Cantón de"</span>)</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Se sustituyen los "del" por "de" para facilitar la creación del regex</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>data_filtrado<span class="sc">$</span>Nombre.de.la.institución <span class="ot">&lt;-</span> <span class="fu">str_replace_all</span>(data_filtrado<span class="sc">$</span>Nombre.de.la.institución,<span class="st">"del"</span>,<span class="st">"de"</span>)</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Se separa en dos columna</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>data_filtrado <span class="ot">&lt;-</span> data_filtrado <span class="sc">%&gt;%</span> <span class="fu">separate</span>(Nombre.de.la.institución,</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>                                            <span class="fu">c</span>(<span class="st">"Institución"</span>,<span class="st">"Nombre"</span>)</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>                                            ,<span class="at">sep =</span> <span class="st">"(?i)</span><span class="sc">\\</span><span class="st">A^.*?(?&lt;!de).*?</span><span class="sc">\\</span><span class="st">Kde"</span>)</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Se limpian los espacios en blanco</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>data_filtrado<span class="sc">$</span>Nombre <span class="ot">&lt;-</span> <span class="fu">str_trim</span>(data_filtrado<span class="sc">$</span>Nombre,<span class="at">side =</span> <span class="st">"both"</span>) </span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Se aplica limpieza sobre esas columnas</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Se pasa a formato de titulo y se corrigen ciertos elementos</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">10</span><span class="sc">:</span><span class="dv">12</span>) {</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>data_filtrado[,i] <span class="ot">&lt;-</span> <span class="fu">str_to_title</span>(data_filtrado[,i])</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>data_filtrado[,i] <span class="ot">&lt;-</span> <span class="fu">str_replace_all</span>(data_filtrado[,i],<span class="st">'</span><span class="sc">\\</span><span class="st">b(De)</span><span class="sc">\\</span><span class="st">b'</span>,<span class="st">"de"</span>)</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>data_filtrado[,i] <span class="ot">&lt;-</span> <span class="fu">str_replace_all</span>(data_filtrado[,i],<span class="st">'</span><span class="sc">\\</span><span class="st">b(Los)</span><span class="sc">\\</span><span class="st">b'</span>,<span class="st">"los"</span>)</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a><span class="co"># Se pasa a formato de título y se pasa a minúscula el "De" resultante</span></span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>data_filtrado<span class="sc">$</span>Institución <span class="ot">&lt;-</span> <span class="fu">str_to_title</span>(data_filtrado<span class="sc">$</span>Institución)</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>data_filtrado<span class="sc">$</span>Nombre <span class="ot">&lt;-</span> <span class="fu">str_to_title</span>(data_filtrado<span class="sc">$</span>Nombre)</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>data_filtrado<span class="sc">$</span>Nombre <span class="ot">&lt;-</span> <span class="fu">str_replace_all</span>(data_filtrado<span class="sc">$</span>Nombre,<span class="st">'</span><span class="sc">\\</span><span class="st">b(De)</span><span class="sc">\\</span><span class="st">b'</span>,<span class="st">"de"</span>)</span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a><span class="co"># data_filtrado &lt;- respaldo</span></span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>respaldo <span class="ot">&lt;-</span> data_filtrado</span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a><span class="co"># Se pasa a formato de oración diversas columnas</span></span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">17</span><span class="sc">:</span><span class="dv">19</span>) {</span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>data_filtrado[,i] <span class="ot">&lt;-</span> <span class="fu">str_to_sentence</span>(data_filtrado[,i])</span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>data_filtrado<span class="sc">$</span>Enc.Solic.Est.Ofert <span class="ot">&lt;-</span> <span class="fu">str_to_sentence</span>(data_filtrado<span class="sc">$</span>Enc.Solic.Est.Ofert)</span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a>data_filtrado<span class="sc">$</span>Nombre <span class="ot">&lt;-</span> <span class="fu">str_replace_all</span>(data_filtrado<span class="sc">$</span>Nombre,<span class="st">" de Heredia"</span>,<span class="st">""</span>)</span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>data_filtrado<span class="sc">$</span>Nombre <span class="ot">&lt;-</span> <span class="fu">str_replace_all</span>(data_filtrado<span class="sc">$</span>Nombre,<span class="st">" de Pacayas"</span>,<span class="st">""</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="búsqueda-y-localización-de-errores" class="level1">
+<h1>Búsqueda y localización de errores</h1>
+<p>Se analiza la consistencia del texto de algunas columnas de interés. Esto con el fin de encontrar y localizar posibles errores. Para esto se utiliza la función <code>unique()</code> para conocer los valores únicos de cada columna, con lo cual es posible conocer si existe alguna inconsistencia.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Se escriben y concatenan los nombres de las columnas de interés</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Se excluye una de ellas para visualizar mejor el resultado</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>nombres <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Estado.del.concurso"</span>,<span class="st">"Clasificación.del.objeto"</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Tipo.de.procedimiento"</span>,<span class="st">"Tipo.de.modalidad"</span>) <span class="co">#,"Fundamento.jurídico")</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Se realiza bucle para aplicar la misma función a las columnas seleccionadas</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(nombres)) {</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">message</span>(<span class="fu">paste0</span>(<span class="st">"Resultados para la columna llamada "</span>,nombres[i],<span class="st">"..."</span>))</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  a <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"data_filtrado$"</span>,nombres[i])</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">unique</span>(<span class="fu">eval</span>(<span class="fu">parse</span>(<span class="at">text =</span> a))))</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Resultados para la columna llamada Estado.del.concurso...</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "En evaluación"           "Adjudicación en firme"  
+ [3] "Contrato"                "Desierto/Infructuoso"   
+ [5] ""                        "Adjudicado"             
+ [7] "Apelación o Revocación"  "En apertura"            
+ [9] "Nulidad absoluta"        "En recepción de ofertas"
+[11] "Objetado"                "Publicado"              </code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Resultados para la columna llamada Clasificación.del.objeto...</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Bienes"           "Servicios"        "Bienes/servicios" "Obra publica"    </code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Resultados para la columna llamada Tipo.de.procedimiento...</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Licitación pública nacional" "Licitación abreviada"       
+[3] "Contratación directa"        "Contratación especial"      
+[5] "Remate"                      "Licitación reducida"        
+[7] "Licitación menor"           </code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Resultados para la columna llamada Tipo.de.modalidad...</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Según demanda"                                       
+[2] "Servicios"                                           
+[3] "Cantidad definida"                                   
+[4] "Arrendamiento de inmuebles sin opción de compra"     
+[5] NA                                                    
+[6] "Remate para dar en arrendamiento bienes inmuebles"   
+[7] "Arrendamiento de bienes muebles sin opción de compra"</code></pre>
+</div>
+</div>
+<p>Se aprecia que existe una consistencia mínima (no se repiten valores que tienen el mismo significado) en los valores de las columnas, por lo tanto no es necesario aplicar una limpieza a las mismas.</p>
+<section id="conversiones-de-tipos" class="level2">
+<h2 class="anchored" data-anchor-id="conversiones-de-tipos">Conversiones de tipos</h2>
+<p>Para la búsqueda y localización de errores es posible revisar las columnas de interés. Esto con tal de buscar y localizar posibles errores que afecten la consistencia de los datos. Antes de ello, es posible descartar algunas columnas que no ofrecen ningún tipo de información.</p>
+</section>
+</section>
+<section id="códigos-de-cantón" class="level1">
+<h1>Códigos de cantón</h1>
+<p>Para facilitar un posible análisis espacial es necesario añadir los códigos de cantón. Para esto se extraen los códigos de cantón del límite cantonal 1:5000 (obtenido del SNIT). Para facilitar el proceso se remueven las tildes.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gsubfn)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>cant.sf <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">"sp/LimCant5K.shp"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `LimCant5K' from data source 
+  `C:\Users\gusan\Documents\GitHub\R-Geografia-y-Data\posts\SICOP_Limpieza\sp\LimCant5K.shp' 
+  using driver `ESRI Shapefile'
+Simple feature collection with 82 features and 9 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 156152 ymin: 608833.8 xmax: 658879.5 ymax: 1241118
+Projected CRS: CR05 / CRTM05</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>cant_nombres <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(cant.sf[,<span class="dv">3</span><span class="sc">:</span><span class="dv">4</span>])</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>cant_nombres <span class="ot">&lt;-</span> cant_nombres[<span class="fu">order</span>(cant_nombres<span class="sc">$</span>cod_canton),]</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>unwanted_array <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="st">'Š'</span><span class="ot">=</span><span class="st">'S'</span>, <span class="st">'š'</span><span class="ot">=</span><span class="st">'s'</span>, <span class="st">'Ž'</span><span class="ot">=</span><span class="st">'Z'</span>, <span class="st">'ž'</span><span class="ot">=</span><span class="st">'z'</span>, <span class="st">'À'</span><span class="ot">=</span><span class="st">'A'</span>, <span class="st">'Á'</span><span class="ot">=</span><span class="st">'A'</span>, <span class="st">'Â'</span><span class="ot">=</span><span class="st">'A'</span>,<span class="st">'Ã'</span><span class="ot">=</span><span class="st">'A'</span>, <span class="st">'Ä'</span><span class="ot">=</span><span class="st">'A'</span>, <span class="st">'Å'</span><span class="ot">=</span><span class="st">'A'</span>, <span class="st">'Æ'</span><span class="ot">=</span><span class="st">'A'</span>, <span class="st">'Ç'</span><span class="ot">=</span><span class="st">'C'</span>, <span class="st">'È'</span><span class="ot">=</span><span class="st">'E'</span>, <span class="st">'É'</span><span class="ot">=</span><span class="st">'E'</span>,<span class="st">'Ê'</span><span class="ot">=</span><span class="st">'E'</span>, <span class="st">'Ë'</span><span class="ot">=</span><span class="st">'E'</span>, <span class="st">'Ì'</span><span class="ot">=</span><span class="st">'I'</span>, <span class="st">'Í'</span><span class="ot">=</span><span class="st">'I'</span>, <span class="st">'Î'</span><span class="ot">=</span><span class="st">'I'</span>, <span class="st">'Ï'</span><span class="ot">=</span><span class="st">'I'</span>, <span class="st">'Ò'</span><span class="ot">=</span><span class="st">'O'</span>, <span class="st">'Ó'</span><span class="ot">=</span><span class="st">'O'</span>, <span class="st">'Ô'</span><span class="ot">=</span><span class="st">'O'</span>, <span class="st">'Õ'</span><span class="ot">=</span><span class="st">'O'</span>, <span class="st">'Ö'</span><span class="ot">=</span><span class="st">'O'</span>, <span class="st">'Ø'</span><span class="ot">=</span><span class="st">'O'</span>, <span class="st">'Ù'</span><span class="ot">=</span><span class="st">'U'</span>,<span class="st">'Ú'</span><span class="ot">=</span><span class="st">'U'</span>, <span class="st">'Û'</span><span class="ot">=</span><span class="st">'U'</span>, <span class="st">'Ü'</span><span class="ot">=</span><span class="st">'U'</span>, <span class="st">'Ý'</span><span class="ot">=</span><span class="st">'Y'</span>, <span class="st">'Þ'</span><span class="ot">=</span><span class="st">'B'</span>, <span class="st">'ß'</span><span class="ot">=</span><span class="st">'Ss'</span>, <span class="st">'à'</span><span class="ot">=</span><span class="st">'a'</span>, <span class="st">'á'</span><span class="ot">=</span><span class="st">'a'</span>, <span class="st">'â'</span><span class="ot">=</span><span class="st">'a'</span>, <span class="st">'ã'</span><span class="ot">=</span><span class="st">'a'</span>,<span class="st">'ä'</span><span class="ot">=</span><span class="st">'a'</span>,<span class="st">'å'</span><span class="ot">=</span><span class="st">'a'</span>, <span class="st">'æ'</span><span class="ot">=</span><span class="st">'a'</span>, <span class="st">'ç'</span><span class="ot">=</span><span class="st">'c'</span>,<span class="st">'è'</span><span class="ot">=</span><span class="st">'e'</span>, <span class="st">'é'</span><span class="ot">=</span><span class="st">'e'</span>, <span class="st">'ê'</span><span class="ot">=</span><span class="st">'e'</span>, <span class="st">'ë'</span><span class="ot">=</span><span class="st">'e'</span>,<span class="st">'ì'</span><span class="ot">=</span><span class="st">'i'</span>,<span class="st">'í'</span><span class="ot">=</span><span class="st">'i'</span>, <span class="st">'î'</span><span class="ot">=</span><span class="st">'i'</span>, <span class="st">'ï'</span><span class="ot">=</span><span class="st">'i'</span>, <span class="st">'ð'</span><span class="ot">=</span><span class="st">'o'</span>, <span class="st">'ò'</span><span class="ot">=</span><span class="st">'o'</span>, <span class="st">'ó'</span><span class="ot">=</span><span class="st">'o'</span>, <span class="st">'ô'</span><span class="ot">=</span><span class="st">'o'</span>, <span class="st">'õ'</span><span class="ot">=</span><span class="st">'o'</span>,<span class="st">'ö'</span><span class="ot">=</span><span class="st">'o'</span>, <span class="st">'ø'</span><span class="ot">=</span><span class="st">'o'</span>, <span class="st">'ù'</span><span class="ot">=</span><span class="st">'u'</span>, <span class="st">'ú'</span><span class="ot">=</span><span class="st">'u'</span>, <span class="st">'û'</span><span class="ot">=</span><span class="st">'u'</span>, <span class="st">'ý'</span><span class="ot">=</span><span class="st">'y'</span>, <span class="st">'ý'</span><span class="ot">=</span><span class="st">'y'</span>, <span class="st">'þ'</span><span class="ot">=</span><span class="st">'b'</span>, <span class="st">'ÿ'</span><span class="ot">=</span><span class="st">'y'</span> ) <span class="co"># Lista de acentos y sus equivalentes sin acento</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>cant_nombres<span class="sc">$</span>canton <span class="ot">&lt;-</span> <span class="fu">gsubfn</span>(<span class="fu">paste</span>(<span class="fu">names</span>(unwanted_array),<span class="at">collapse=</span><span class="st">'|'</span>), </span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>                      unwanted_array,cant_nombres<span class="sc">$</span>canton)</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>data_filtrado<span class="sc">$</span>Nombre <span class="ot">&lt;-</span> <span class="fu">gsubfn</span>(<span class="fu">paste</span>(<span class="fu">names</span>(unwanted_array),<span class="at">collapse=</span><span class="st">'|'</span>), </span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>                               unwanted_array,data_filtrado<span class="sc">$</span>Nombre)</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>data_filtrado<span class="sc">$</span>Nombre <span class="ot">&lt;-</span> <span class="fu">str_replace_all</span>(data_filtrado<span class="sc">$</span>Nombre,<span class="st">"Leon Cortes"</span>,</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">"Leon Cortes Castro"</span>)</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>data_filtrado<span class="sc">$</span>Nombre <span class="ot">&lt;-</span> <span class="fu">str_replace_all</span>(data_filtrado<span class="sc">$</span>Nombre,<span class="st">"</span><span class="sc">\\</span><span class="st">."</span>,<span class="st">""</span>)</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(unwanted_array)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Ahora lo que se desea, es agregar una columna con los códigos de cantón para facilitar la representación espacial de los datos. Para esto se utiliza un loop para agregar valores para cada fila de la columna basado en los valores del nombre de cantón</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>data_filtrado<span class="sc">$</span>cant_cod <span class="ot">&lt;-</span> <span class="st">""</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(data_filtrado<span class="sc">$</span>Nombre)) {</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Se busca el nombre de cantón en la columna nombre, fila i</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  check <span class="ot">&lt;-</span> data_filtrado<span class="sc">$</span>Nombre[i]</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Se busca el nombre de cantón en la tabla de cant_nombres y su fila</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  check2 <span class="ot">&lt;-</span> <span class="fu">which</span>(cant_nombres<span class="sc">$</span>canton <span class="sc">==</span> check)</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Se guarda el código de cantón en una variable</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>  cod <span class="ot">&lt;-</span> cant_nombres[check2,<span class="dv">1</span>]</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Se agrega el número de cantón a data_filtrado</span></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>  data_filtrado<span class="sc">$</span>cant_cod[i] <span class="ot">&lt;-</span> cod</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Se remueve la variable con el código</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rm</span>(cod)</span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Exportar la tabla</span></span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(data_filtrado,<span class="st">"output/csv/TablaLimpiaSICOP.csv"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Con estos estos códigos de cantón se facilita la representación espacial de los datos. Además de esto es posible cambiar de formato largo a formato ancho. Un formato ancho (wide format) posee valores que no se repiten en la columna de nombres, mientras que en un formato largo se repiten valores en la columna de nombres (por ejemplo, se repiten nombres de cantón).</p>
+<ul>
+<li><p>Primero se pasa a formato ancho para facilitar la visualización en mapa</p></li>
+<li><p>Dentro de la aplicación, hacer referencia a la tabla con el nombre de cantón para referirse a la tabla original</p></li>
+</ul>
+</section>
+<section id="retoques-adicionales-a-la-tabla-limpia" class="level1">
+<h1>Retoques adicionales a la tabla limpia</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>data.sicop <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"output/csv/TablaLimpiaSICOP.csv"</span>,<span class="at">fileEncoding =</span> <span class="st">"windows-1252"</span>)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>data.sicop <span class="ot">&lt;-</span> data.sicop[,<span class="sc">-</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">6</span>,<span class="dv">7</span>,<span class="dv">9</span>,<span class="dv">10</span><span class="sc">:</span><span class="dv">13</span>,<span class="dv">20</span>,<span class="dv">21</span>)]</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>data.sicop[<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">8</span><span class="sc">:</span><span class="dv">10</span>)][data.sicop[<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">8</span><span class="sc">:</span><span class="dv">10</span>)] <span class="sc">==</span> <span class="st">''</span>] <span class="ot">&lt;-</span> <span class="st">"Sin definir"</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>data.sicop[, <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">8</span><span class="sc">:</span><span class="dv">10</span>)][<span class="fu">is.na</span>(data.sicop[, <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">8</span><span class="sc">:</span><span class="dv">10</span>)])] <span class="ot">&lt;-</span> <span class="st">"Sin definir"</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>data.sicop<span class="sc">$</span>Clasificación.del.objeto <span class="ot">&lt;-</span> <span class="fu">str_replace_all</span>(data_filtrado<span class="sc">$</span>Clasificación.del.objeto,<span class="st">"Obra publica"</span>, <span class="st">"Obra pública"</span>)</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(data.sicop,<span class="st">"output/csv/TablaLimpiaSICOP_reducida_2.csv"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">Referencias</h2><div id="refs" class="references csl-bib-body hanging-indent" data-line-spacing="2" role="list">
+<div id="ref-datacleaningR" class="csl-entry" role="listitem">
+Jonge, E. D., &amp; Loo, M. van der. (2013). <em>An introduction to data cleaning with R</em>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copiado");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copiado");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

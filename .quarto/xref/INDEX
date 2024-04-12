@@ -13,5 +13,14 @@
   },
   "posts/SICOP/index.qmd": {
     "index.html": "40f31445"
+  },
+  "posts/SICOP_Limpieza/index.qmd": {
+    "index.html": "4ec8b206"
+  },
+  "posts/SICOP_Representacion/index.qmd": {
+    "index.html": "ae8c7ed1"
+  },
+  "posts/OSM_ScrapePuntos/index.qmd": {
+    "index.html": "2706e6ae"
   }
 }

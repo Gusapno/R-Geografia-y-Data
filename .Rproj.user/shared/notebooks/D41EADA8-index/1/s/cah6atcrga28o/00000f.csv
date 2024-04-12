@@ -1,0 +1,6 @@
+"0","unique.estado <- as.data.frame(sort(unique(data$Estado.del.concurso)))"
+"0","unique.estado$id <- seq(1:dim(unique.estado)[1])"
+"0","colnames(unique.estado) <- c(""Estado del concurso"",""id"")"
+"0",""
+"0","# sort(unique(data$Nombre.de.la.institución))"
+"0",""

@@ -1,0 +1,55 @@
+"0","#| output: false"
+"0",""
+"0",""
+"0","# Directorio de trabajo"
+"0","setwd(""~/GitHub/R-Geografia-y-Data/posts/SICOP_Limpieza"")"
+"0",""
+"0","# Paquetes a utilizar"
+"0","library(tidyverse)"
+"0","library(knitr)"
+"0","library(reshape2)"
+"2","
+Attaching package: ‘reshape2’
+
+"
+"2","The following objects are masked from ‘package:data.table’:
+
+    dcast, melt
+
+"
+"2","The following object is masked from ‘package:tidyr’:
+
+    smiths
+
+"
+"0","library(magrittr)"
+"2","
+Attaching package: ‘magrittr’
+
+"
+"2","The following object is masked from ‘package:purrr’:
+
+    set_names
+
+"
+"2","The following object is masked from ‘package:tidyr’:
+
+    extract
+
+"
+"0","library(kableExtra)"
+"2","
+Attaching package: ‘kableExtra’
+
+"
+"2","The following object is masked from ‘package:dplyr’:
+
+    group_rows
+
+"
+"0","library(stringi)"
+"0","library(scraEP) # Para remover acentos"
+"0","library(gsubfn)"
+"0","# Datos a utilizar"
+"0","data <- read.csv(""csv/ConcursosSICOP.csv"")"
+"0","data <- data[,-1]"

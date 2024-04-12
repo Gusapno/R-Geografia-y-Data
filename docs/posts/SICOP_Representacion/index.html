@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.353">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Gabriel Ramírez">
+
+<title>R, Geografía y Data - Representación de datos</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "Sin resultados",
+    "search-matching-documents-text": "documentos encontrados",
+    "search-copy-link-title": "Copiar el enlace en la búsqueda",
+    "search-hide-matches-text": "Ocultar resultados adicionales",
+    "search-more-match-text": "resultado adicional en este documento",
+    "search-more-matches-text": "resultados adicionales en este documento",
+    "search-clear-button-title": "Borrar",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar"
+  }
+}</script>
+<script src="../../site_libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
+<script src="../../site_libs/jquery-1.12.4/jquery.min.js"></script>
+<link href="../../site_libs/leaflet-1.3.1/leaflet.css" rel="stylesheet">
+<script src="../../site_libs/leaflet-1.3.1/leaflet.js"></script>
+<link href="../../site_libs/leafletfix-1.0.0/leafletfix.css" rel="stylesheet">
+<script src="../../site_libs/proj4-2.6.2/proj4.min.js"></script>
+<script src="../../site_libs/Proj4Leaflet-1.0.1/proj4leaflet.js"></script>
+<link href="../../site_libs/rstudio_leaflet-1.3.1/rstudio_leaflet.css" rel="stylesheet">
+<script src="../../site_libs/leaflet-binding-2.0.4.1/leaflet.js"></script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">R, Geografía y Data</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Buscar"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Navegación de palanca" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html" rel="" target="">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/Gusapno" rel="" target=""><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/Gabo06719007" rel="" target=""><i class="bi bi-twitter" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default toc-left page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Representación de datos</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">SIG</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Autor/a</div>
+      <div class="quarto-title-meta-contents">
+               <p>Gabriel Ramírez </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Fecha de publicación</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">23 de diciembre de 2022</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Contenidos</h2>
+   
+  <ul>
+  <li><a href="#representación-de-datos" id="toc-representación-de-datos" class="nav-link active" data-scroll-target="#representación-de-datos">Representación de datos</a>
+  <ul class="collapse">
+  <li><a href="#representación-general" id="toc-representación-general" class="nav-link" data-scroll-target="#representación-general">Representación general</a></li>
+  <li><a href="#representación-espacial-de-datos" id="toc-representación-espacial-de-datos" class="nav-link" data-scroll-target="#representación-espacial-de-datos">Representación espacial de datos</a></li>
+  </ul></li>
+  <li><a href="#representación-con-shiny" id="toc-representación-con-shiny" class="nav-link" data-scroll-target="#representación-con-shiny">Representación con Shiny</a></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(shiny)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggpubr)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringdist)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">scipen=</span><span class="dv">999</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">setwd</span>(<span class="st">"~/GitHub/R-Geografia-y-Data/posts/SICOP_Representacion"</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>data.sicop <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"output/csv/TablaLimpiaSICOP.csv"</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>cant.sp <span class="ot">&lt;-</span> <span class="fu">read_sf</span>(<span class="st">"sp/LimiteCantonal5K_.shp"</span>)<span class="co">#, options = "ENCODING=WINDOWS-1252")</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>data.sicop<span class="sc">$</span>fecha.hora.publicacion <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(data.sicop<span class="sc">$</span>Fecha.hora.de.publicación, </span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>                                             <span class="st">"%d/%m/%Y %H:%M"</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>data.sicop<span class="sc">$</span>Estado.del.concurso <span class="ot">&lt;-</span> <span class="fu">sub</span>(<span class="st">"^$"</span>, <span class="st">"Sin clasificar"</span>, </span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>                                      data.sicop<span class="sc">$</span>Estado.del.concurso)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="representación-de-datos" class="level1">
+<h1>Representación de datos</h1>
+<p>La representación de datos es una técnica utilizada para obtener información de los datos al utilizar señales visuales tales como gráficos o mapas. Su utilidad radica en que colabora a entender grandes cantidades de datos de una forma sencilla.</p>
+<section id="representación-general" class="level2">
+<h2 class="anchored" data-anchor-id="representación-general">Representación general</h2>
+<p>Con los datos obtenidos es posible aplicar diferentes formas de representación. Algunas de las formas mas simples de representación son: diagramas de barras. En este caso se utiliza para conocer la frecuencia de elementos en una variable. En este caso se aplica con las variables:</p>
+<ul>
+<li><p>Estado del concurso</p></li>
+<li><p>Tipo de Procedimiento</p></li>
+<li><p>Tipo de modalidad</p></li>
+<li><p>Clasificación del objeto</p></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># EL COUNT DE PLYR PARA para cambiar los valores vacios por "Sin clasificar"</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>data.filter <span class="ot">&lt;-</span> plyr<span class="sc">::</span><span class="fu">count</span>(data.sicop<span class="sc">$</span>Estado.del.concurso) </span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Es posible explorar algunos atributos de interés</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Se aplica el mismo procedimiento para las variables mencionadas</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>concurso <span class="ot">&lt;-</span> plyr<span class="sc">::</span><span class="fu">count</span>(data.sicop<span class="sc">$</span>Estado.del.concurso) <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  x,<span class="sc">-</span>freq),<span class="at">y =</span> freq)) <span class="sc">+</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>,<span class="at">fill =</span> <span class="st">"#f68060"</span>, <span class="at">alpha =</span> <span class="fl">0.6</span>, <span class="at">width =</span> <span class="fl">0.4</span>)<span class="sc">+</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()<span class="sc">+</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_discrete</span>(<span class="at">labels =</span> <span class="fu">label_wrap_gen</span>(<span class="dv">20</span>)) <span class="sc">+</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">""</span>)<span class="sc">+</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">""</span>) <span class="sc">+</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Estado del concurso"</span>) <span class="sc">+</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Para Estado del concurso y Tipo de procedimiento se obtiene:</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Para Tipo de modalidad y Clasificación del objeto se obtiene:</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>También es posible explorar la frecuencia de los presupuestos totales estimado mediante un histograma. Al graficar se obtiene el siguiente resultado:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(data.sicop, <span class="fu">aes</span>(<span class="at">x=</span>Presupuesto.total.estimado)) <span class="sc">+</span> </span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">bins =</span> <span class="dv">40</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Al existir una gran concentración de datos en bajos presupuestos y algunos dispersos en altos presupuestos el histograma no ofrece mucho detalle. Para obtener más detalle es posible filtrar por los valores que estén por abajo y por arriba de la media.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># hist</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># POR ABAJO DE LA MEDIA</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>abajo <span class="ot">&lt;-</span> data.sicop <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Presupuesto.total.estimado <span class="sc">&lt;</span> </span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>                                 <span class="fu">mean</span>(Presupuesto.total.estimado)) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>Presupuesto.total.estimado)) <span class="sc">+</span> </span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">bins =</span> <span class="dv">80</span>) <span class="sc">+</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Abajo de la media"</span>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co"># POR ARRIBA DE LA MEDIA</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>arriba <span class="ot">&lt;-</span> data.sicop <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Presupuesto.total.estimado <span class="sc">&gt;</span> </span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>                                  <span class="fu">mean</span>(Presupuesto.total.estimado)) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>Presupuesto.total.estimado)) <span class="sc">+</span> </span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">bins =</span> <span class="dv">80</span>) <span class="sc">+</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Arriba de la media"</span>)</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="fu">ggarrange</span>(abajo, arriba, </span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>          <span class="at">ncol =</span> <span class="dv">1</span>, <span class="at">nrow =</span> <span class="dv">2</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Se observa que la mayoría de valores se encuentra por debajo de la media. Para observar con más detalle, es posible filtrar aun más los datos. En este caso se filtra por los valores menores de 25 000 000 CRC (esto para apreciar la mayor concentración de datos).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>data.sicop <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Presupuesto.total.estimado <span class="sc">&lt;</span> <span class="dv">25000000</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>Presupuesto.total.estimado)) <span class="sc">+</span> </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">bins =</span> <span class="dv">80</span>) <span class="sc">+</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Por abajo de 25 millones de colones"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="representación-espacial-de-datos" class="level2">
+<h2 class="anchored" data-anchor-id="representación-espacial-de-datos">Representación espacial de datos</h2>
+<p>Cada elemento que fue scrapeado en las etapas anteriores está asociado a una municipalidad, las cuales pueden asociarse a su ubicación puntual (coordenadas de ubicación de la municipalidad) o a toda la unidad espacial (cantón). En otra entrada de foro se obtuvieron las ubicaciones puntuales de las municipalidades del país. Dichos puntos pueden ser asociados a la información obtenida del SICOP para realizar una representación espacial. Para simplificar, sería posible agregar las coordenadas a la capa de cantones; también se añaden los datos de conteo de categorías para las variables <em>Estado del concurso</em>, <em>Tipo de procedimiento</em> y <em>Tipo de modalidad.</em></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Se leen los puntos de las municipalidades</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>puntos_muni <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"csv/Puntos_Municipalidades.csv"</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>data.sicop.graficos <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"csv/Tab_Cod_SICOP.csv"</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Se añade formato</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(data.sicop.graficos) <span class="ot">&lt;-</span> <span class="fu">str_replace_all</span>(<span class="fu">colnames</span>(data.sicop.graficos),<span class="at">pattern =</span> <span class="st">"</span><span class="sc">\\</span><span class="st">."</span>,<span class="at">replacement =</span> <span class="st">" "</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(data.sicop.graficos)[<span class="dv">2</span>] <span class="ot">&lt;-</span> <span class="st">"canton.sint"</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Se crea una columna con cantones sin tilde (facilita join despues)</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Se utiliza un array de caracteres no deseados</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>unwanted_array <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="st">'Š'</span><span class="ot">=</span><span class="st">'S'</span>, <span class="st">'š'</span><span class="ot">=</span><span class="st">'s'</span>, <span class="st">'Ž'</span><span class="ot">=</span><span class="st">'Z'</span>, <span class="st">'ž'</span><span class="ot">=</span><span class="st">'z'</span>,<span class="st">'À'</span><span class="ot">=</span><span class="st">'A'</span>, <span class="st">'Á'</span><span class="ot">=</span><span class="st">'A'</span>, <span class="st">'Â'</span><span class="ot">=</span><span class="st">'A'</span>,<span class="st">'Ã'</span><span class="ot">=</span><span class="st">'A'</span>, <span class="st">'Ä'</span><span class="ot">=</span><span class="st">'A'</span>, <span class="st">'Å'</span><span class="ot">=</span><span class="st">'A'</span>, <span class="st">'Æ'</span><span class="ot">=</span><span class="st">'A'</span>, <span class="st">'Ç'</span><span class="ot">=</span><span class="st">'C'</span>, <span class="st">'È'</span><span class="ot">=</span><span class="st">'E'</span>, <span class="st">'É'</span><span class="ot">=</span><span class="st">'E'</span>,<span class="st">'Ê'</span><span class="ot">=</span><span class="st">'E'</span>, <span class="st">'Ë'</span><span class="ot">=</span><span class="st">'E'</span>, <span class="st">'Ì'</span><span class="ot">=</span><span class="st">'I'</span>, <span class="st">'Í'</span><span class="ot">=</span><span class="st">'I'</span>, <span class="st">'Î'</span><span class="ot">=</span><span class="st">'I'</span>, <span class="st">'Ï'</span><span class="ot">=</span><span class="st">'I'</span>, <span class="st">'Ò'</span><span class="ot">=</span><span class="st">'O'</span>, <span class="st">'Ó'</span><span class="ot">=</span><span class="st">'O'</span>, <span class="st">'Ô'</span><span class="ot">=</span><span class="st">'O'</span>, <span class="st">'Õ'</span><span class="ot">=</span><span class="st">'O'</span>, <span class="st">'Ö'</span><span class="ot">=</span><span class="st">'O'</span>, <span class="st">'Ø'</span><span class="ot">=</span><span class="st">'O'</span>, <span class="st">'Ù'</span><span class="ot">=</span><span class="st">'U'</span>,<span class="st">'Ú'</span><span class="ot">=</span><span class="st">'U'</span>, <span class="st">'Û'</span><span class="ot">=</span><span class="st">'U'</span>, <span class="st">'Ü'</span><span class="ot">=</span><span class="st">'U'</span>, <span class="st">'Ý'</span><span class="ot">=</span><span class="st">'Y'</span>, <span class="st">'Þ'</span><span class="ot">=</span><span class="st">'B'</span>, <span class="st">'ß'</span><span class="ot">=</span><span class="st">'Ss'</span>, <span class="st">'à'</span><span class="ot">=</span><span class="st">'a'</span>, <span class="st">'á'</span><span class="ot">=</span><span class="st">'a'</span>, <span class="st">'â'</span><span class="ot">=</span><span class="st">'a'</span>, <span class="st">'ã'</span><span class="ot">=</span><span class="st">'a'</span>,<span class="st">'ä'</span><span class="ot">=</span><span class="st">'a'</span>,<span class="st">'å'</span><span class="ot">=</span><span class="st">'a'</span>, <span class="st">'æ'</span><span class="ot">=</span><span class="st">'a'</span>, <span class="st">'ç'</span><span class="ot">=</span><span class="st">'c'</span>,<span class="st">'è'</span><span class="ot">=</span><span class="st">'e'</span>, <span class="st">'é'</span><span class="ot">=</span><span class="st">'e'</span>, <span class="st">'ê'</span><span class="ot">=</span><span class="st">'e'</span>, <span class="st">'ë'</span><span class="ot">=</span><span class="st">'e'</span>,<span class="st">'ì'</span><span class="ot">=</span><span class="st">'i'</span>,<span class="st">'í'</span><span class="ot">=</span><span class="st">'i'</span>, <span class="st">'î'</span><span class="ot">=</span><span class="st">'i'</span>, <span class="st">'ï'</span><span class="ot">=</span><span class="st">'i'</span>, <span class="st">'ð'</span><span class="ot">=</span><span class="st">'o'</span>, <span class="st">'ò'</span><span class="ot">=</span><span class="st">'o'</span>, <span class="st">'ó'</span><span class="ot">=</span><span class="st">'o'</span>, <span class="st">'ô'</span><span class="ot">=</span><span class="st">'o'</span>, <span class="st">'õ'</span><span class="ot">=</span><span class="st">'o'</span>,<span class="st">'ö'</span><span class="ot">=</span><span class="st">'o'</span>, <span class="st">'ø'</span><span class="ot">=</span><span class="st">'o'</span>, <span class="st">'ù'</span><span class="ot">=</span><span class="st">'u'</span>, <span class="st">'ú'</span><span class="ot">=</span><span class="st">'u'</span>, <span class="st">'û'</span><span class="ot">=</span><span class="st">'u'</span>, <span class="st">'ý'</span><span class="ot">=</span><span class="st">'y'</span>, <span class="st">'ý'</span><span class="ot">=</span><span class="st">'y'</span>, <span class="st">'þ'</span><span class="ot">=</span><span class="st">'b'</span>, <span class="st">'ÿ'</span><span class="ot">=</span><span class="st">'y'</span> ) </span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Se aplica lo siguiente para crear una columna de cantones sin tilde</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>cant.sp<span class="sc">$</span>canton.sint <span class="ot">&lt;-</span> gsubfn<span class="sc">::</span><span class="fu">gsubfn</span>(<span class="fu">paste</span>(<span class="fu">names</span>(unwanted_array),</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>                                            <span class="at">collapse=</span><span class="st">'|'</span>),</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>                                            unwanted_array,</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>                                            <span class="fu">as.character</span>(cant.sp<span class="sc">$</span>canton))</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>cant.sp <span class="ot">&lt;-</span> <span class="fu">left_join</span>(cant.sp,data.sicop.graficos, <span class="at">by =</span> <span class="st">"canton.sint"</span>)</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>cant.sp<span class="sc">$</span>sum.procedimiento <span class="ot">&lt;-</span> cant.sp<span class="sc">$</span><span class="st">`</span><span class="at">Licitación abreviada</span><span class="st">`</span> <span class="sc">+</span> cant.sp<span class="sc">$</span><span class="st">`</span><span class="at">Licitación menor</span><span class="st">`</span> <span class="sc">+</span> cant.sp<span class="sc">$</span><span class="st">`</span><span class="at">Licitación pública nacional</span><span class="st">`</span> <span class="sc">+</span> cant.sp<span class="sc">$</span><span class="st">`</span><span class="at">Licitación reducida</span><span class="st">`</span> <span class="sc">+</span> cant.sp<span class="sc">$</span><span class="st">`</span><span class="at">Contratación especial</span><span class="st">`</span> <span class="sc">+</span> cant.sp<span class="sc">$</span><span class="st">`</span><span class="at">Contratación directa</span><span class="st">`</span> <span class="sc">+</span> cant.sp<span class="sc">$</span>Remate</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Añadir coordenadas a la capa de cantones</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>cant.sp<span class="sc">$</span>X <span class="ot">&lt;-</span> puntos_muni<span class="sc">$</span>X</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>cant.sp<span class="sc">$</span>Y <span class="ot">&lt;-</span> puntos_muni<span class="sc">$</span>Y</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Se agrupa por nombres (cantones) y se hace un resumen por suma del presupuesto</span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a><span class="co"># y se convierte a data frame</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>data.sicop.presup <span class="ot">&lt;-</span> data.sicop <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(Nombre) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">presup.tot.est=</span><span class="fu">sum</span>(Presupuesto.total.estimado),</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>            <span class="at">.groups =</span> <span class="st">'drop'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>()</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a><span class="co"># Se cambia el nombre de columna para facilitar el join</span></span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(data.sicop.presup) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"canton"</span>,<span class="st">"presup.tot.est"</span>)</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a><span class="co"># Se hace el join por la columna "canton"</span></span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>cant.sp <span class="ot">&lt;-</span> <span class="fu">left_join</span>(cant.sp,data.sicop.presup, <span class="at">by =</span> <span class="st">"canton"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Con los datos actuales es posible plasmarlos con la librería leaflet. Se utiliza <code>radius</code> para aumentar el tamaño de los puntos según el presupuesto. También se añade un popup (al dar click a cada punto) que muestre la provincia, cantón y el presupuesto.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(leaflet)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scales)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">leaflet</span>() <span class="sc">%&gt;%</span> <span class="fu">addTiles</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">addCircleMarkers</span>(<span class="at">lng =</span> <span class="fu">as.numeric</span>(cant.sp<span class="sc">$</span>X),</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>                   <span class="at">lat =</span> <span class="fu">as.numeric</span>(cant.sp<span class="sc">$</span>Y),</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>                  <span class="at">radius =</span> <span class="fu">rescale</span>(cant.sp<span class="sc">$</span>presup.tot.est, <span class="at">to =</span> <span class="fu">c</span>(<span class="dv">5</span>,<span class="dv">40</span>)),</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>                   <span class="at">popup =</span> <span class="fu">paste0</span>(<span class="st">"&lt;strong&gt;Provincia: &lt;/strong&gt;"</span>,cant.sp<span class="sc">$</span>provincia, </span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>                                  <span class="st">"&lt;br&gt;&lt;strong&gt;"</span>,<span class="st">"Cantón: &lt;/strong&gt;"</span>,cant.sp<span class="sc">$</span>canton,</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>                                  <span class="st">"&lt;br&gt;&lt;strong&gt;"</span>,<span class="st">"Presupuesto total: &lt;/strong&gt;₡"</span>,</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>                                  <span class="fu">formatC</span>(cant.sp<span class="sc">$</span>presup.tot.est,</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">format=</span><span class="st">"fg"</span>, <span class="at">big.mark=</span><span class="st">','</span>)))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="htmlwidget-446ece1b37adc9706062" style="width:100%;height:464px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-446ece1b37adc9706062">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addCircleMarkers","args":[[9.4313011,8.9787376,9.3730051,9.5293179,9.6588391,9.6533286,9.8474914,9.8392836,8.6490816,8.625428,8.8200104,9.1727709,9.6254121,9.6099467,9.6836891,9.8627578,9.8988373,9.7990851,9.9083746,9.8453066,9.8649524,9.9766004,9.8932479,9.9065681,9.916119,9.8687632,9.9033714,9.9921702,9.9083058,9.9157082,9.9111368,9.9314192,9.9205608,9.9164333,9.933115,9.9951323,9.9332302,9.9454901,9.9625138,9.9357862,10.1418239,9.9794189,10.017275,9.9609623,9.9916759,9.9766492,9.9805793,9.9792162,9.9947803,10.0879097,9.9989845,10.0588739,10.0029246,10.0141245,10.0204734,10.0163374,10.0374418,10.0563598,10.0768707,10.0734221,10.0975154,10.0918813,10.0892557,10.0984019,10.0767448,10.2688335,10.1849558,10.2089207,10.2815454,10.2029127,10.3225271,10.4269051,10.4714406,10.4500138,10.4468764,10.3462149,10.5263698,10.6702022,11.0305628,10.6305165,10.8989493,11.0741161],[-84.1625859,-83.5326761,-83.7027928,-84.3620995,-84.0217673,-83.969649,-84.3144733,-83.8657837,-82.9417679,-83.1538376,-82.9702222,-83.3356079,-82.8512749,-84.6220874,-84.0418109,-84.093278,-84.0651069,-84.1614287,-84.441089,-83.9388298,-83.9206174,-84.8363739,-83.7464017,-83.6838138,-84.2425464,-83.9042933,-84.1002972,-83.033404,-83.9852255,-84.0356256,-84.5239488,-84.0947618,-84.1401695,-83.8107725,-84.1811359,-85.251632,-84.0526443,-84.0564446,-84.07847,-84.5227677,-85.4537856,-84.3804411,-84.2102523,-84.0476161,-84.6677694,-84.0074502,-84.0912337,-84.1853459,-84.0982371,-84.4703381,-84.1162254,-85.4178646,-84.1520906,-84.1000717,-84.1249174,-84.0552705,-84.1597384,-84.4334521,-84.2452944,-84.3120071,-84.3781496,-84.729126,-84.3482451,-83.5057025,-83.2895739,-85.5710831,-84.3924786,-83.6817057,-84.9578056,-83.7891709,-84.4307648,-85.0917943,-84.9690782,-84.0134593,-85.5517098,-84.2135451,-85.2553833,-84.8214634,-84.7172541,-85.438814,-85.0148108,-85.6344879],[5.02101300989721,5.08385512610783,null,5.00163644391081,null,null,null,null,5.01535393316908,5.01871815653086,5.01548395491231,5.00996375172208,5.00085954613964,5,null,null,5.00831008138921,5.00526194480328,5.03746134900564,5.00453174189411,5.03250612884103,5.00821559753364,null,5.00904970162175,5.00379739108641,5.01681074505835,null,null,null,5.0149759439392,5.00858600025761,null,null,5.00707049338966,5.00523992718985,null,5.01050878175497,5.04683188428168,null,5.00242970612439,5.0134714070215,5.0036315408594,5.0183893352104,5.02297965949419,null,null,5.00677719299238,null,5.00932464855302,null,5.33745225548453,5.0021821732707,5.01246528746552,5.00146051524523,5.00152900060203,5.00082648666001,null,5.00004958888884,null,5.0086703543415,null,5.00597662546029,null,5.00078921374971,5.00133066942637,5.04896491843777,5.01725704803327,null,null,null,40,5.00042813766695,null,null,5.01757699089988,null,null,null,5.00658544801056,11.8990886226122,5.00430506313042,null],null,null,{"interactive":true,"className":"","stroke":true,"color":"#03F","weight":5,"opacity":0.5,"fill":true,"fillColor":"#03F","fillOpacity":0.2},null,null,["<strong>Provincia: <\/strong>Puntarenas<br><strong>Cantón: <\/strong>Quepos<br><strong>Presupuesto total: <\/strong>¢127,122,450","<strong>Provincia: <\/strong>Puntarenas<br><strong>Cantón: <\/strong>Osa<br><strong>Presupuesto total: <\/strong>¢507,298,526","<strong>Provincia: <\/strong>San José<br><strong>Cantón: <\/strong>Pérez Zeledón<br><strong>Presupuesto total: <\/strong>¢NA","<strong>Provincia: <\/strong>Puntarenas<br><strong>Cantón: <\/strong>Parrita<br><strong>Presupuesto total: <\/strong>¢9,900,000","<strong>Provincia: <\/strong>San José<br><strong>Cantón: <\/strong>Tarrazú<br><strong>Presupuesto total: <\/strong>¢NA","<strong>Provincia: <\/strong>San José<br><strong>Cantón: <\/strong>Dota<br><strong>Presupuesto total: <\/strong>¢NA","<strong>Provincia: <\/strong>San José<br><strong>Cantón: <\/strong>Puriscal<br><strong>Presupuesto total: <\/strong>¢NA","<strong>Provincia: <\/strong>Cartago<br><strong>Cantón: <\/strong>Paraíso<br><strong>Presupuesto total: <\/strong>¢NA","<strong>Provincia: <\/strong>Puntarenas<br><strong>Cantón: <\/strong>Corredores<br><strong>Presupuesto total: <\/strong>¢92,886,722","<strong>Provincia: <\/strong>Puntarenas<br><strong>Cantón: <\/strong>Golfito<br><strong>Presupuesto total: <\/strong>¢113,239,271","<strong>Provincia: <\/strong>Puntarenas<br><strong>Cantón: <\/strong>Coto Brus<br><strong>Presupuesto total: <\/strong>¢93,673,315","<strong>Provincia: <\/strong>Puntarenas<br><strong>Cantón: <\/strong>Buenos Aires<br><strong>Presupuesto total: <\/strong>¢60,277,731","<strong>Provincia: <\/strong>Limón<br><strong>Cantón: <\/strong>Talamanca<br><strong>Presupuesto total: <\/strong>¢5,200,000","<strong>Provincia: <\/strong>Puntarenas<br><strong>Cantón: <\/strong>Garabito<br><strong>Presupuesto total: <\/strong>¢2","<strong>Provincia: <\/strong>San José<br><strong>Cantón: <\/strong>León Cortés Castro<br><strong>Presupuesto total: <\/strong>¢NA","<strong>Provincia: <\/strong>San José<br><strong>Cantón: <\/strong>Aserrí<br><strong>Presupuesto total: <\/strong>¢NA","<strong>Provincia: <\/strong>San José<br><strong>Cantón: <\/strong>Desamparados<br><strong>Presupuesto total: <\/strong>¢50,273,518","<strong>Provincia: <\/strong>San José<br><strong>Cantón: <\/strong>Acosta<br><strong>Presupuesto total: <\/strong>¢31,833,200","<strong>Provincia: <\/strong>San José<br><strong>Cantón: <\/strong>Turrubares<br><strong>Presupuesto total: <\/strong>¢226,630,000","<strong>Provincia: <\/strong>Cartago<br><strong>Cantón: <\/strong>El Guarco<br><strong>Presupuesto total: <\/strong>¢27,415,690","<strong>Provincia: <\/strong>Cartago<br><strong>Cantón: <\/strong>Cartago<br><strong>Presupuesto total: <\/strong>¢196,652,395","<strong>Provincia: <\/strong>Puntarenas<br><strong>Cantón: <\/strong>Puntarenas<br><strong>Presupuesto total: <\/strong>¢49,701,919","<strong>Provincia: <\/strong>Cartago<br><strong>Cantón: <\/strong>Jiménez<br><strong>Presupuesto total: <\/strong>¢NA","<strong>Provincia: <\/strong>Cartago<br><strong>Cantón: <\/strong>Turrialba<br><strong>Presupuesto total: <\/strong>¢54,748,000","<strong>Provincia: <\/strong>San José<br><strong>Cantón: <\/strong>Mora<br><strong>Presupuesto total: <\/strong>¢22,973,086","<strong>Provincia: <\/strong>Cartago<br><strong>Cantón: <\/strong>Oreamuno<br><strong>Presupuesto total: <\/strong>¢101,700,000","<strong>Provincia: <\/strong>San José<br><strong>Cantón: <\/strong>Alajuelita<br><strong>Presupuesto total: <\/strong>¢NA","<strong>Provincia: <\/strong>Limón<br><strong>Cantón: <\/strong>Limón<br><strong>Presupuesto total: <\/strong>¢NA","<strong>Provincia: <\/strong>Cartago<br><strong>Cantón: <\/strong>La Unión<br><strong>Presupuesto total: <\/strong>¢NA","<strong>Provincia: <\/strong>San José<br><strong>Cantón: <\/strong>Curridabat<br><strong>Presupuesto total: <\/strong>¢90,600,000","<strong>Provincia: <\/strong>Alajuela<br><strong>Cantón: <\/strong>Orotina<br><strong>Presupuesto total: <\/strong>¢51,942,745","<strong>Provincia: <\/strong>San José<br><strong>Cantón: <\/strong>San José<br><strong>Presupuesto total: <\/strong>¢NA","<strong>Provincia: <\/strong>San José<br><strong>Cantón: <\/strong>Escazú<br><strong>Presupuesto total: <\/strong>¢NA","<strong>Provincia: <\/strong>Cartago<br><strong>Cantón: <\/strong>Alvarado<br><strong>Presupuesto total: <\/strong>¢42,774,380","<strong>Provincia: <\/strong>San José<br><strong>Cantón: <\/strong>Santa Ana<br><strong>Presupuesto total: <\/strong>¢31,700,000","<strong>Provincia: <\/strong>Guanacaste<br><strong>Cantón: <\/strong>Nandayure<br><strong>Presupuesto total: <\/strong>¢NA","<strong>Provincia: <\/strong>San José<br><strong>Cantón: <\/strong>Montes de Oca<br><strong>Presupuesto total: <\/strong>¢63,575,000","<strong>Provincia: <\/strong>San José<br><strong>Cantón: <\/strong>Goicoechea<br><strong>Presupuesto total: <\/strong>¢283,318,946","<strong>Provincia: <\/strong>San José<br><strong>Cantón: <\/strong>Tibás<br><strong>Presupuesto total: <\/strong>¢NA","<strong>Provincia: <\/strong>Alajuela<br><strong>Cantón: <\/strong>San Mateo<br><strong>Presupuesto total: <\/strong>¢14,699,000","<strong>Provincia: <\/strong>Guanacaste<br><strong>Cantón: <\/strong>Nicoya<br><strong>Presupuesto total: <\/strong>¢81,498,000","<strong>Provincia: <\/strong>Alajuela<br><strong>Cantón: <\/strong>Atenas<br><strong>Presupuesto total: <\/strong>¢21,969,742","<strong>Provincia: <\/strong>Alajuela<br><strong>Cantón: <\/strong>Alajuela<br><strong>Presupuesto total: <\/strong>¢111,250,000","<strong>Provincia: <\/strong>San José<br><strong>Cantón: <\/strong>Moravia<br><strong>Presupuesto total: <\/strong>¢139,020,094","<strong>Provincia: <\/strong>Puntarenas<br><strong>Cantón: <\/strong>Esparza<br><strong>Presupuesto total: <\/strong>¢NA","<strong>Provincia: <\/strong>San José<br><strong>Cantón: <\/strong>Vázquez de Coronado<br><strong>Presupuesto total: <\/strong>¢NA","<strong>Provincia: <\/strong>Heredia<br><strong>Cantón: <\/strong>Santo Domingo<br><strong>Presupuesto total: <\/strong>¢41,000,000","<strong>Provincia: <\/strong>Heredia<br><strong>Cantón: <\/strong>Belén<br><strong>Presupuesto total: <\/strong>¢NA","<strong>Provincia: <\/strong>Heredia<br><strong>Cantón: <\/strong>San Pablo<br><strong>Presupuesto total: <\/strong>¢56,411,347","<strong>Provincia: <\/strong>Alajuela<br><strong>Cantón: <\/strong>San Ramón<br><strong>Presupuesto total: <\/strong>¢NA","<strong>Provincia: <\/strong>Heredia<br><strong>Cantón: <\/strong>Heredia<br><strong>Presupuesto total: <\/strong>¢2,041,485,587","<strong>Provincia: <\/strong>Guanacaste<br><strong>Cantón: <\/strong>Hojancha<br><strong>Presupuesto total: <\/strong>¢13,201,500","<strong>Provincia: <\/strong>Heredia<br><strong>Cantón: <\/strong>Flores<br><strong>Presupuesto total: <\/strong>¢75,411,277","<strong>Provincia: <\/strong>Heredia<br><strong>Cantón: <\/strong>San Rafael<br><strong>Presupuesto total: <\/strong>¢8,835,684","<strong>Provincia: <\/strong>Heredia<br><strong>Cantón: <\/strong>Barva<br><strong>Presupuesto total: <\/strong>¢9,250,000","<strong>Provincia: <\/strong>Heredia<br><strong>Cantón: <\/strong>San Isidro<br><strong>Presupuesto total: <\/strong>¢5,000,000","<strong>Provincia: <\/strong>Heredia<br><strong>Cantón: <\/strong>Santa Bárbara<br><strong>Presupuesto total: <\/strong>¢NA","<strong>Provincia: <\/strong>Alajuela<br><strong>Cantón: <\/strong>Palmares<br><strong>Presupuesto total: <\/strong>¢300,000","<strong>Provincia: <\/strong>Alajuela<br><strong>Cantón: <\/strong>Poás<br><strong>Presupuesto total: <\/strong>¢NA","<strong>Provincia: <\/strong>Alajuela<br><strong>Cantón: <\/strong>Grecia<br><strong>Presupuesto total: <\/strong>¢52,453,062","<strong>Provincia: <\/strong>Alajuela<br><strong>Cantón: <\/strong>Naranjo<br><strong>Presupuesto total: <\/strong>¢NA","<strong>Provincia: <\/strong>Puntarenas<br><strong>Cantón: <\/strong>Montes de Oro<br><strong>Presupuesto total: <\/strong>¢36,156,805","<strong>Provincia: <\/strong>Alajuela<br><strong>Cantón: <\/strong>Sarchí<br><strong>Presupuesto total: <\/strong>¢NA","<strong>Provincia: <\/strong>Limón<br><strong>Cantón: <\/strong>Siquirres<br><strong>Presupuesto total: <\/strong>¢4,774,510","<strong>Provincia: <\/strong>Limón<br><strong>Cantón: <\/strong>Matina<br><strong>Presupuesto total: <\/strong>¢8,050,155","<strong>Provincia: <\/strong>Guanacaste<br><strong>Cantón: <\/strong>Santa Cruz<br><strong>Presupuesto total: <\/strong>¢296,223,167","<strong>Provincia: <\/strong>Alajuela<br><strong>Cantón: <\/strong>Zarcero<br><strong>Presupuesto total: <\/strong>¢104,400,000","<strong>Provincia: <\/strong>Limón<br><strong>Cantón: <\/strong>Guácimo<br><strong>Presupuesto total: <\/strong>¢NA","<strong>Provincia: <\/strong>Guanacaste<br><strong>Cantón: <\/strong>Abangares<br><strong>Presupuesto total: <\/strong>¢NA","<strong>Provincia: <\/strong>Limón<br><strong>Cantón: <\/strong>Pococí<br><strong>Presupuesto total: <\/strong>¢NA","<strong>Provincia: <\/strong>Alajuela<br><strong>Cantón: <\/strong>San Carlos<br><strong>Presupuesto total: <\/strong>¢211,739,570,000","<strong>Provincia: <\/strong>Guanacaste<br><strong>Cantón: <\/strong>Cañas<br><strong>Presupuesto total: <\/strong>¢2,590,107","<strong>Provincia: <\/strong>Guanacaste<br><strong>Cantón: <\/strong>Tilarán<br><strong>Presupuesto total: <\/strong>¢NA","<strong>Provincia: <\/strong>Heredia<br><strong>Cantón: <\/strong>Sarapiquí<br><strong>Presupuesto total: <\/strong>¢NA","<strong>Provincia: <\/strong>Guanacaste<br><strong>Cantón: <\/strong>Carrillo<br><strong>Presupuesto total: <\/strong>¢106,335,559","<strong>Provincia: <\/strong>Alajuela<br><strong>Cantón: <\/strong>Río Cuarto<br><strong>Presupuesto total: <\/strong>¢NA","<strong>Provincia: <\/strong>Guanacaste<br><strong>Cantón: <\/strong>Bagaces<br><strong>Presupuesto total: <\/strong>¢NA","<strong>Provincia: <\/strong>Alajuela<br><strong>Cantón: <\/strong>Guatuso<br><strong>Presupuesto total: <\/strong>¢NA","<strong>Provincia: <\/strong>Alajuela<br><strong>Cantón: <\/strong>Los Chiles<br><strong>Presupuesto total: <\/strong>¢39,840,000","<strong>Provincia: <\/strong>Guanacaste<br><strong>Cantón: <\/strong>Liberia<br><strong>Presupuesto total: <\/strong>¢41,737,430,240","<strong>Provincia: <\/strong>Alajuela<br><strong>Cantón: <\/strong>Upala<br><strong>Presupuesto total: <\/strong>¢26,044,351","<strong>Provincia: <\/strong>Guanacaste<br><strong>Cantón: <\/strong>La Cruz<br><strong>Presupuesto total: <\/strong>¢NA"],null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"limits":{"lat":[8.625428,11.0741161],"lng":[-85.6344879,-82.8512749]}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+</section>
+<section id="representación-con-shiny" class="level1">
+<h1>Representación con Shiny</h1>
+<p>También es posible representar el presupuesto con un mapa de coropletas aunque en este caso no se aplicará dicho método. Mediante la librería <code>shiny</code> y <code>shinydashboard</code> <span class="citation" data-cites="shiny shinydashboard">(<a href="#ref-shiny" role="doc-biblioref">Chang et&nbsp;al., 2022</a>; <a href="#ref-shinydashboard" role="doc-biblioref">Chang &amp; Borges Ribeiro, 2021</a>)</span> es posible llegar al siguiente resultado:</p>
+ <iframe id="example1" src="https://geogusapno.shinyapps.io/SICOP-Mapa_Simple/" style="border: none; width: 100%; height: 900px" frameborder="0"></iframe>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">Referencias</h2><div id="refs" class="references csl-bib-body hanging-indent" data-line-spacing="2" role="list">
+<div id="ref-shinydashboard" class="csl-entry" role="listitem">
+Chang, W., &amp; Borges Ribeiro, B. (2021). <em>shinydashboard: Create Dashboards with ’Shiny’</em>. <a href="https://CRAN.R-project.org/package=shinydashboard">https://CRAN.R-project.org/package=shinydashboard</a>
+</div>
+<div id="ref-shiny" class="csl-entry" role="listitem">
+Chang, W., Cheng, J., Allaire, J., Sievert, C., Schloerke, B., Xie, Y., Allen, J., McPherson, J., Dipert, A., &amp; Borges, B. (2022). <em>shiny: Web Application Framework for R</em>. <a href="https://CRAN.R-project.org/package=shiny">https://CRAN.R-project.org/package=shiny</a>
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copiado");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copiado");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

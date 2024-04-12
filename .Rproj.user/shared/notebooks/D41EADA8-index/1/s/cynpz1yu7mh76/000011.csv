@@ -1,0 +1,5 @@
+"0","str <- data.frame(variable = names(data),"
+"0","           classe = sapply(data, typeof),"
+"0","           first_values = sapply(data, function(x) paste0(head(x),  collapse = "", "")),"
+"0","           row.names = NULL)"
+"0","colnames(str) <- c(""Columna"",""Tipo"",""Primeros valores"")"

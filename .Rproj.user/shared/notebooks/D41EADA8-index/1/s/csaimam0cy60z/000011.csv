@@ -1,0 +1,8 @@
+"0","data.sicop$Clasificación.del.objeto <- str_replace_all(data_filtrado$Clasificación.del.objeto,""Obra publica"", ""Obra pública"")
+"
+"2","Error in exists(cacheKey, where = .rs.WorkingDataEnv, inherits = FALSE) : 
+  invalid first argument
+"
+"2","Error in assign(cacheKey, frame, .rs.CachedDataEnv) : 
+  attempt to use zero-length variable name
+"

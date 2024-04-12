@@ -1,0 +1,4 @@
+"0","#| echo: false"
+"0","str <- str[22:27,]"
+"0","kbl(str) %>%"
+"0","  kable_styling(bootstrap_options = ""striped"", full_width = T, position = ""left"",font_size = 14)"

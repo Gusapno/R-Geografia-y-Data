@@ -1,0 +1,4 @@
+"0","unique.institucion <- as.data.frame(sort(unique(data$Nombre.de.la.institución)))"
+"0","unique.institucion$id <- seq(1:dim(unique.institucion)[1])"
+"0","colnames(unique.institucion) <- c(""Nombre de la institución"",""id"")"
+"0",""
