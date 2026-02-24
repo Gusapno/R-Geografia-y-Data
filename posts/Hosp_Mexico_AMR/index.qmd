@@ -1,9 +1,13 @@
 ---
 title: "Análisis Exploratorio de Datos AMR"
 author: "Gabriel Ramírez"
-format: html
+date: "04/02/2022"
+lang: es
 editor: visual
+csl: apa.csl
 bibliography: references.bib
+categories: [SIG]
+image: "image.jpg"
 ---
 
 ## Análisis Descriptivo de Datos Hospital México
@@ -101,7 +105,7 @@ knitr::kable(tablas_db, caption = "Cantidad de registros por tabla")
 
 ### Integridad de los datos
 
-El objetivo principal del análisis exploratorio de datos univariados es extraer las características básicas y patrones de los datos [@meloun2011]. Esto quiere decir que al analizar datos el primer paso es explorar que es lo que existe en las variables, sean estos univariados, bivariados o multivariados; para datos categóricos se resumen las proporciones para cada categoría y para datos cuantitativos se aplican técnicas para conocer las medidas de dispersión, centro y forma de los datos; además este análisis contribuye a comprender las relaciones entre las variables[@loftus2022].
+El objetivo principal del análisis exploratorio de datos univariados es extraer las características básicas y patrones de los datos [@loftus2022]. Esto quiere decir que al analizar datos el primer paso es explorar que es lo que existe en las variables, sean estos univariados, bivariados o multivariados; para datos categóricos se resumen las proporciones para cada categoría y para datos cuantitativos se aplican técnicas para conocer las medidas de dispersión, centro y forma de los datos; además este análisis contribuye a comprender las relaciones entre las variables[@loftus2022].
 
 Se utiliza el siguiente código para cargar todas las tablas:
 
@@ -145,7 +149,7 @@ columnas_fact_ast <- data.frame(Nombres_de_columnas = colnames(fact_ast), Descri
 ```
 
 |                                       |                                                                                                                                                                                                                                                                                                                                          |
-|:--------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|:-------------|:---------------------------------------------------------|
 | **Nombres_de_columnas**               | **Descripción**                                                                                                                                                                                                                                                                                                                          |
 | id_paciente                           | Contiene un código de identificación anonimizada para el paciente                                                                                                                                                                                                                                                                        |
 | identificacion                        | Identificación del paciente. Esta columna existe pero no posee ninguna información de identificación (está completamente vacía) para efectos de este análisis                                                                                                                                                                            |

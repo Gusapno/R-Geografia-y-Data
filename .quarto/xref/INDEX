@@ -22,5 +22,11 @@
   },
   "posts/OSM_ScrapePuntos/index.qmd": {
     "index.html": "2706e6ae"
+  },
+  "posts/Hosp_Mexico_AMR/index.qmd": {
+    "index.html": "38c5fcef"
+  },
+  "posts/Hosp_Mexico_AMR/EDA.qmd": {
+    "EDA.html": "7b4f8487"
   }
 }
