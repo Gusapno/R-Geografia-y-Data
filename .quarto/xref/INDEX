@@ -28,5 +28,11 @@
   },
   "posts/Hosp_Mexico_AMR/EDA.qmd": {
     "EDA.html": "7b4f8487"
+  },
+  "posts/Hosp_Mexico_AMR/index.rmarkdown": {
+    "index.html": "7ff828e5"
+  },
+  "posts/AMR_HospMex/index.qmd": {
+    "index.html": "f13a12e0"
   }
 }

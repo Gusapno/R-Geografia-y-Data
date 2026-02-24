@@ -55,7 +55,26 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -408,7 +427,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="análisis-exploratorio">Análisis exploratorio</h2>
 <section id="integridad-de-los-datos" class="level3">
 <h3 class="anchored" data-anchor-id="integridad-de-los-datos">Integridad de los datos</h3>
-<p>El objetivo principal del análisis exploratorio de datos univariados es extraer las características básicas y patrones de los datos <span class="citation" data-cites="meloun2011">(<a href="#ref-meloun2011" role="doc-biblioref"><strong>meloun2011?</strong></a>)</span>. Esto quiere decir que al analizar datos el primer paso es explorar que es lo que existe en las variables, sean estos univariados, bivariados o multivariados; para datos categóricos se resumen las proporciones para cada categoría y para datos cuantitativos se aplican técnicas para conocer las medidas de dispersión, centro y forma de los datos; además este análisis contribuye a comprender las relaciones entre las variables<span class="citation" data-cites="loftus2022">(<a href="#ref-loftus2022" role="doc-biblioref"><strong>loftus2022?</strong></a>)</span>.</p>
+<p>El objetivo principal del análisis exploratorio de datos univariados es extraer las características básicas y patrones de los datos <span class="citation" data-cites="loftus2022">(<a href="#ref-loftus2022" role="doc-biblioref">Loftus 2022</a>)</span>. Esto quiere decir que al analizar datos el primer paso es explorar que es lo que existe en las variables, sean estos univariados, bivariados o multivariados; para datos categóricos se resumen las proporciones para cada categoría y para datos cuantitativos se aplican técnicas para conocer las medidas de dispersión, centro y forma de los datos; además este análisis contribuye a comprender las relaciones entre las variables<span class="citation" data-cites="loftus2022">(<a href="#ref-loftus2022" role="doc-biblioref">Loftus 2022</a>)</span>.</p>
 <p>Se utiliza el siguiente código para cargar todas las tablas:</p>
 <p>Al explorar la estructura de los datos es posible encontrar elementos que deben ser corregidos mediante la limpieza de datos. Un ejemplo de esto serían valores en una variable que representen lo mismo, pero que a nivel de sistema sean diferentes; por ejemplo un texto que diga <u>“No se efectúa”</u> y otro que diga <u>“No se efectùa”</u>. Al realizar un conteo de datos categóricos esto va a representar un problema, ya que crear dos categorías diferentes para un valor que representa lo mismo. Algunos casos repetitivos en cualquier base de datos son: tildes mal puestas, uso inconsistente de mayúsculas, mal uso de los espacios (puede ser un espacio adicional al inicio, en medio o al final del valor), entre otros.</p>
 <div class="cell">
@@ -427,8 +446,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>En la tabla de las pruebas de susceptibilidad antimicrobiana es posible realizar el conteo de algunas categorías relevantes. Antes de ello es adecuado revisar todas las columnas y realizar una posible descripción de cada una.</p>
 <table class="table">
 <colgroup>
-<col style="width: 10%">
-<col style="width: 89%">
+<col style="width: 47%">
+<col style="width: 52%">
 </colgroup>
 <tbody>
 <tr class="odd">
@@ -630,7 +649,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><img src="EDA_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>Para efectos del trabajo final de graduación denominado “Análisis de la resistencia antimicrobiana en el área de cobertura del Hospital México durante el período 2006-2021” las tablas de mayor interés son: fact_ast (que contiene los resultados de las pruebas de susceptibilidad antimicrobiana).</p>
+<p>Para efectos del trabajo final de graduación denominado “Análisis de la resistencia antimicrobiana en el área de cobertura del Hospital México durante el período 2006-2021” una de las tablas de mayor interés es fact_ast (que contiene los resultados de las pruebas de susceptibilidad antimicrobiana) y es necesario revisar la misma a profundidad.</p>
 <p>Lo siguientes pasos para el trabajo con esta base de datos son:</p>
 <ul>
 <li><p>Limpieza de tablas que incluyan los errores mencionados</p></li>
@@ -640,12 +659,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Esto facilitaría el análisis en grupos más generales y encontrar posibles patrones.</li>
 </ul></li>
 </ul>
+<p>También si fuera posible confirmar la descripción de las columnas de esta tabla sería útil para el desarrollo del análisis</p>
+
 
 
 </section>
 </section>
 
-</main> <!-- /main -->
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-loftus2022" class="csl-entry" role="listitem">
+Loftus, Stephen C. 2022. <span>“Exploratory Data Analyses: Describing Our Data.”</span> In, 47–72. Elsevier. <a href="https://doi.org/10.1016/b978-0-12-820788-8.00017-1">https://doi.org/10.1016/b978-0-12-820788-8.00017-1</a>.
+</div>
+</div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
