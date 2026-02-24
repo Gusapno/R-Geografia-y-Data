@@ -1,0 +1,235 @@
+---
+title: "Análisis Exploratorio de Datos AMR"
+author: "Gabriel Ramírez"
+format: html
+editor: visual
+bibliography: references.bib
+---
+
+## Análisis Descriptivo de Datos Hospital México
+
+Se realiza un análisis descriptivo de la base de datos de los pacientes del Hospital México y las posibles resistencias y/o multiresistencias de los microorganismos a los antimicrobianos. Librerías utilizadas:
+
+```{r}
+#| results: hide
+#| warning: false
+library(DBI) # Interfaz de base de datos
+library(RPostgres) # Para conectar con PSQL
+library(sf) # Spatial Features, para manejar datos espaciales
+#library(rgeos) # Remover
+library(openxlsx) # Para abrir documentos de Excel
+library(data.table) # Para manejo de tablas
+#library(rgdal) # Remover
+library(dplyr)
+library(tidyverse)
+library(stringr)
+
+library(gt)
+library(knitr)
+library(tibble)
+
+```
+
+Para conectar la base de datos se añaden los parámetros de conexión:
+
+```{r}
+db_host <- "localhost"  # IP de la DB
+db_port <- 5432         # PostgreSQL puerto
+db_name <- "HospMex"    # Nombre de la db
+db_user <- "postgres"   # Usuario de la db
+db_pass <- "root"       # Contraseña
+
+```
+
+La conexión se realiza con el siguiente código:
+
+```{r}
+conn <- dbConnect(
+  RPostgres::Postgres(),
+  dbname = db_name,
+  host = db_host,
+  port = db_port,
+  user = db_user,
+  password = db_pass
+)
+```
+
+Se aprecia que están las quince tablas que componen la base de datos y algunas tablas adicionales relacionadas a la variable espacial de la base de datos (por complemento de PostGIS). Las tablas adicionales son: geography_columns, geometry_columns, spatial_ref_sys. El siguiente código selecciona las tablas desde `information_schema.columns` para obtener el nombre de cada una de las tablas y su cantidad de columnas.
+
+```{r}
+resumen <- dbGetQuery(conn, "SELECT 
+    table_name, 
+    COUNT(*) AS column_count
+FROM 
+    information_schema.columns
+WHERE 
+    table_schema = 'public'
+GROUP BY 
+    table_name
+ORDER BY 
+    table_name;")
+```
+
+```{r}
+#| echo: false
+
+resumen <- resumen[-c(16:18),]
+knitr::kable(resumen, caption = "Tabla de la base de datos")
+
+```
+
+```{r}
+nombres_de_tablas <- resumen$table_name
+
+tablas_db <- data.frame(nombreTabla=character(), 
+                        nrows=integer(), 
+                        stringsAsFactors=FALSE) 
+
+
+
+
+for (tabla_en_base_de_datos in nombres_de_tablas) {
+  valor <- dbGetQuery(conn, paste0("SELECT COUNT(*) FROM ",tabla_en_base_de_datos,";"))
+  tablas_db <- rbind(tablas_db, data.frame(tabla_en_base_de_datos, 
+                                           valor))
+}
+
+knitr::kable(tablas_db, caption = "Cantidad de registros por tabla")
+```
+
+## Análisis exploratorio
+
+### Integridad de los datos
+
+El objetivo principal del análisis exploratorio de datos univariados es extraer las características básicas y patrones de los datos [@meloun2011]. Esto quiere decir que al analizar datos el primer paso es explorar que es lo que existe en las variables, sean estos univariados, bivariados o multivariados; para datos categóricos se resumen las proporciones para cada categoría y para datos cuantitativos se aplican técnicas para conocer las medidas de dispersión, centro y forma de los datos; además este análisis contribuye a comprender las relaciones entre las variables[@loftus2022].
+
+Se utiliza el siguiente código para cargar todas las tablas:
+
+```{r}
+#| echo: false
+
+for (tabla_en_base_de_datos in nombres_de_tablas) {
+  assign(tabla_en_base_de_datos, dbGetQuery(conn, 
+                                            paste0("SELECT * FROM ",
+                                                   tabla_en_base_de_datos,";")))
+}
+
+```
+
+Al explorar la estructura de los datos es posible encontrar elementos que deben ser corregidos mediante la limpieza de datos. Un ejemplo de esto serían valores en una variable que representen lo mismo, pero que a nivel de sistema sean diferentes; por ejemplo un texto que diga ["No se efectúa"]{.underline} y otro que diga ["No se efectùa"]{.underline}. Al realizar un conteo de datos categóricos esto va a representar un problema, ya que crear dos categorías diferentes para un valor que representa lo mismo. Algunos casos repetitivos en cualquier base de datos son: tildes mal puestas, uso inconsistente de mayúsculas, mal uso de los espacios (puede ser un espacio adicional al inicio, en medio o al final del valor), entre otros.
+
+```{r}
+
+nombres_columnas <- colnames(dim_aislamiento)
+
+# Para limpiar espacios al inicio, final y además espacios repetidos adentro del "string"
+for (nombre in nombres_columnas) {
+  dim_aislamiento[,nombre] <- str_squish(dim_aislamiento[,nombre])
+  #print(sort(unique(dim_aislamiento[,nombre])))
+}
+
+
+```
+
+Este código puede aplicarse programáticamente para todas las tablas y sus respectivas columnas, aunque antes de hacerlo sería adecuado realizar una inspección manual para conocer que tipo de valores se estaría modificando.
+
+### Conteo de categorías: fact_ast
+
+En la tabla de las pruebas de susceptibilidad antimicrobiana es posible realizar el conteo de algunas categorías relevantes. Antes de ello es adecuado revisar todas las columnas y realizar una posible descripción de cada una.
+
+```{r}
+#| echo: false
+columnas_fact_ast <- data.frame(Nombres_de_columnas = colnames(fact_ast), Descripción = c("Contiene un código de identificación anonimizada para el paciente","Identificación del paciente. Esta columna existe pero no posee ninguna información de identificación (está completamente vacía) para efectos de este análisis","Código de identificación de la muestra, sirve para asociar con la tabla que posee los registros sobre las muestras", "Código interno de la muestra, posiblemente se refiere a un código utilizado en los sistemas hospitalarios", "El número de la muestra aparentemente es lo mismo que el código interno de la muestra", "Identificación del aislamiento, sirve para realizar consultas con la tabla dim_aislamiento", "Similar al caso de código interno muestra, posiblemente una codificación utilizada en los sistemas del hospital","Número del aislamiento. Esta columna podría ser removida de la tabla fact_ast ya que contiene información repetitiva que podría ser obtenida mediante una consulta con la tabla dim_aislamiento y la columna id_aislamiento", "qgs_fid podría referirse a una columna de codificación con códigos de provincia, cantón y distrito (vienen de todo tipo de unidad espacial, no es consistente) relacionada a alguna salida con datos del software QGIS.","El código de distrito se refiere a la codificación del distrito que usualmente tiene la estructura XX-YY-ZZ donde XX es el número de la provincia (por ejemplo 04 sería Heredia), YY es el número de cantón (por ejemplo 06 es San Isidro) y ZZ se refiere al distrito (por ejemplo, 02 podría ser el distrito de San José de San Isidro", "Podría ser la fecha de admisión del paciente", "Fecha de la muestra (fecha del resultado, fecha del análisis o de la recepción de la muestra)","Fecha de recepción de la muestra (o del paciente)", "Fecha final (no es claro a que podría referirse con final)", "Consultar sobre esta", "Consultar sobre esta columna. Categoría no expertizada tiene diferente valores como un '+' y un '-' entonces podría referirse a si es o no es resistente.", "Consultar. Podría referirse a la concentración mínima inhibitoria de los antibióticas para controlar el crecimiento microbiano mediante agentes antimicrobianos.", "Consultar sobre esta columna y terminología adecuada. halo podría referirse a la zona de inhibición que rodea un agente antimicrobiano", "categoría final podría referirse a si es o no es resistente entre otros valores como: Derreprimida, BLEE tipo CTX-M, AMP C inducible", "Consultar. Tipo de análisis puede referirse al análisis realizado para dterminar si es resistente o no", "Consultar. Método determinación se refiere si el método fue manual o instrumental (o si no se cuenta con la información del método)", "Edad","Consultar. Edad AST podría referirse a grupos de edad relacionados al análisis de las pruebas de susceptibilidad.", "Grupos de edad. Esto podría servir para realizar una pirámide poblacional", "orden de edad podría referirse a un código que se refiere a diversos grupos de edad, mientras más alta la edad, más alto el orden de edad.","grupo_edad(2)","Categoría final etiqueta indica si es resistente, sensible, pendiente, intermedio o si es NaN", "Nombre del distrito del paciente (nombre textualmente, no código del distrito)", "id del microorganismo, sirve para identificar el microorgnaismo y realizar consultas", "código del microorganismo sirve para realizar consultas con la tabla de dim_organismos","id del antimicrobiano, para identificar y realizAR consultas con la tabla dim_antibioticos","código antimicrobiano es el código textual corto del antimicrobiano."))
+
+
+```
+
+|                                       |                                                                                                                                                                                                                                                                                                                                          |
+|:---------------------------------|:-------------------------------------|
+| **Nombres_de_columnas**               | **Descripción**                                                                                                                                                                                                                                                                                                                          |
+| id_paciente                           | Contiene un código de identificación anonimizada para el paciente                                                                                                                                                                                                                                                                        |
+| identificacion                        | Identificación del paciente. Esta columna existe pero no posee ninguna información de identificación (está completamente vacía) para efectos de este análisis                                                                                                                                                                            |
+| id_muestra                            | Código de identificación de la muestra, sirve para asociar con la tabla que posee los registros sobre las muestras                                                                                                                                                                                                                       |
+| codigo_interno_muestra                | Código interno de la muestra, posiblemente se refiere a un código utilizado en los sistemas hospitalarios                                                                                                                                                                                                                                |
+| numero_muestra                        | El número de la muestra aparentemente es lo mismo que el código interno de la muestra                                                                                                                                                                                                                                                    |
+| id_aislamiento                        | Identificación del aislamiento, sirve para realizar consultas con la tabla dim_aislamiento                                                                                                                                                                                                                                               |
+| codigo_interno_aislamiento            | Similar al caso de código interno muestra, posiblemente una codificación utilizada en los sistemas del hospital                                                                                                                                                                                                                          |
+| numero_aislamiento                    | Número del aislamiento. Esta columna podría ser removida de la tabla fact_ast ya que contiene información repetitiva que podría ser obtenida mediante una consulta con la tabla dim_aislamiento y la columna id_aislamiento                                                                                                              |
+| qgs_fid                               | qgs_fid podría referirse a una columna de codificación con códigos de provincia, cantón y distrito (vienen de todo tipo de unidad espacial, no es consistente) relacionada a alguna salida con datos del software QGIS.                                                                                                                  |
+| codigo_distrito                       | El código de distrito se refiere a la codificación del distrito que usualmente tiene la estructura XX-YY-ZZ donde XX es el número de la provincia (por ejemplo 04 sería Heredia), YY es el número de cantón (por ejemplo 06 es San Isidro) y ZZ se refiere al distrito (por ejemplo, 02 podría ser el distrito de San José de San Isidro |
+| fecha_admision                        | Podría ser la fecha de admisión del paciente                                                                                                                                                                                                                                                                                             |
+| fecha_muestra                         | Fecha de la muestra (fecha del resultado, fecha del análisis o de la recepción de la muestra)                                                                                                                                                                                                                                            |
+| fecha_recepcion                       | Fecha de recepción de la muestra (o del paciente)                                                                                                                                                                                                                                                                                        |
+| fecha_final                           | Fecha final (no es claro a que podría referirse con final)                                                                                                                                                                                                                                                                               |
+| probabilidad                          | Consultar sobre esta                                                                                                                                                                                                                                                                                                                     |
+| categoria_no_expertizada              | Consultar sobre esta columna. Categoría no expertizada tiene diferente valores como un '+' y un '-' entonces podría referirse a si es o no es resistente.                                                                                                                                                                                |
+| concentracion_minima_inivitoria_final | Consultar. Podría referirse a la concentración mínima inhibitoria de los antibióticas para controlar el crecimiento microbiano mediante agentes antimicrobianos.                                                                                                                                                                         |
+| halo                                  | Consultar sobre esta columna y terminología adecuada. halo podría referirse a la zona de inhibición que rodea un agente antimicrobiano                                                                                                                                                                                                   |
+| categoria_final                       | categoría final podría referirse a si es o no es resistente entre otros valores como: Derreprimida, BLEE tipo CTX-M, AMP C inducible                                                                                                                                                                                                     |
+| tipo_analisis                         | Consultar. Tipo de análisis puede referirse al análisis realizado para dterminar si es resistente o no                                                                                                                                                                                                                                   |
+| metodo_determinacion                  | Consultar. Método determinación se refiere si el método fue manual o instrumental (o si no se cuenta con la información del método)                                                                                                                                                                                                      |
+| edad                                  | Edad                                                                                                                                                                                                                                                                                                                                     |
+| EDAD (AST)                            | Consultar. Edad AST podría referirse a grupos de edad relacionados al análisis de las pruebas de susceptibilidad.                                                                                                                                                                                                                        |
+| grupo_edad                            | Grupos de edad. Esto podría servir para realizar una pirámide poblacional                                                                                                                                                                                                                                                                |
+| orden_edad                            | orden de edad podría referirse a un código que se refiere a diversos grupos de edad, mientras más alta la edad, más alto el orden de edad.                                                                                                                                                                                               |
+| grupo_edad(2)                         | grupo_edad(2)                                                                                                                                                                                                                                                                                                                            |
+| categoria_final_etiqueta              | Categoría final etiqueta indica si es resistente, sensible, pendiente, intermedio o si es NaN                                                                                                                                                                                                                                            |
+| Distrito_pacientes                    | Nombre del distrito del paciente (nombre textualmente, no código del distrito)                                                                                                                                                                                                                                                           |
+| id_microorganismo                     | id del microorganismo, sirve para identificar el microorgnaismo y realizar consultas                                                                                                                                                                                                                                                     |
+| codigo_microorganismo                 | código del microorganismo sirve para realizar consultas con la tabla de dim_organismos                                                                                                                                                                                                                                                   |
+| id_antimicrobiano                     | id del antimicrobiano, para identificar y realizAR consultas con la tabla dim_antibioticos                                                                                                                                                                                                                                               |
+| codigo_antimicrobiano                 | código antimicrobiano es el código textual corto del antimicrobiano.                                                                                                                                                                                                                                                                     |
+
+Por ejemplo, para la columna método determinación la tabla sería la siguiente:
+
+```{r}
+fact_ast %>% count(metodo_determinacion)
+fact_ast %>% count(metodo_determinacion) %>%
+    ggplot( aes(x=reorder(metodo_determinacion, n), y=n)) +
+    geom_bar(stat="identity", fill="#f68060", alpha=.6, width=.4) +
+    coord_flip() +
+    xlab("") +
+    theme_bw()+
+    ggtitle("Método de determinación")
+```
+
+Para la columna "categoria_final_etiqueta" se obtiene el siguiente resultado
+
+```{r}
+fact_ast %>% count(categoria_final_etiqueta)
+
+fact_ast %>% count(categoria_final_etiqueta) %>%
+    ggplot( aes(x=reorder(categoria_final_etiqueta, n), y=n)) +
+    geom_bar(stat="identity", fill="#f68060", alpha=.6, width=.4) +
+    coord_flip() +
+    xlab("") +
+    theme_bw()+
+    ggtitle("Categoría final etiqueta")
+
+```
+
+Para la columna "categoria_no_expertizada" se obtiene el siguiente resultado
+
+```{r}
+fact_ast %>% count(categoria_no_expertizada)
+
+fact_ast %>% count(categoria_no_expertizada) %>%
+    ggplot( aes(x=reorder(categoria_no_expertizada, n), y=n)) +
+    geom_bar(stat="identity", fill="#f68060", alpha=.6, width=.4) +
+    coord_flip() +
+    xlab("") +
+    theme_bw()+
+    ggtitle("Categoría no expertizada")
+```
+
+Para efectos del trabajo final de graduación denominado "Análisis de la resistencia antimicrobiana en el área de cobertura del Hospital México durante el período 2006-2021" las tablas de mayor interés son: fact_ast (que contiene los resultados de las pruebas de susceptibilidad antimicrobiana).
+
+Lo siguientes pasos para el trabajo con esta base de datos son:
+
+-   Limpieza de tablas que incluyan los errores mencionados
+
+-   Convertir columnas de fechas a tipo fecha
+
+-   Modificar la tabla de diagnósticos para añadir grupos más grandes de diagnósticos según la tabla ICD-10-CM. Esta clasificación es la que se utiliza en la tabla, pero igual sería necesario consultar.
+
+    -   Esto facilitaría el análisis en grupos más generales y encontrar posibles patrones.
